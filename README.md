@@ -8,3 +8,7 @@ because it's just chunks you run before and after. I decided to use a Jupyter No
 &mdash; if even at all &mdash; since finishing college. I thought I'd give them another try.
 
 ## Add notes about the tools used and install requirements later
+
+You will need  for your current version of Chrome.
+
+Python 3.9+ for modern typing
