@@ -6,6 +6,7 @@ refunded_courses.txt
 *.db
 *.db-journal
 courses_to_purchase.txt
+*.pkl
 
 # Github Tempalte
 
