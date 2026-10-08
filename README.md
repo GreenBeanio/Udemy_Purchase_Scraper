@@ -12,3 +12,5 @@ because it's just chunks you run before and after. I decided to use a Jupyter No
 You will need  for your current version of Chrome.
 
 Python 3.9+ for modern typing
+
+Rename `dot.env` into `.env` and modify variables as needed.
