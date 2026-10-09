@@ -2,8 +2,8 @@ from undetected_chromedriver import By
 import os
 import time
 import re
-import src.udemy_scraper.exceptions as u_ec
-import udemy_scraper.owned.classes as u_o_cl
+import src.udemy_purchase_scraper.exceptions as u_ec
+import udemy_purchase_scraper.owned.classes as u_o_cl
 
 def getOwnedInformation(course: any) -> any:
     '''

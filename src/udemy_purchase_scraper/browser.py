@@ -1,5 +1,5 @@
 import undetected_chromedriver as uc
-import udemy_scraper.utils as us_u
+import udemy_purchase_scraper.utils as us_u
 import os
 
 def startBrowser():

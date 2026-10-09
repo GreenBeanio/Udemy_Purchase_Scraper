@@ -3,8 +3,8 @@ import datetime
 from decimal import Decimal
 import os
 import time
-import src.udemy_scraper.exceptions as u_ec
-import udemy_scraper.purchase.classes as u_p_cl
+import src.udemy_purchase_scraper.exceptions as u_ec
+import udemy_purchase_scraper.purchase.classes as u_p_cl
 
 def getPurchasePage(driver: any) -> any:
     '''
