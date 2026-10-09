@@ -14,3 +14,18 @@ You will need  for your current version of Chrome.
 Python 3.9+ for modern typing
 
 Rename `dot.env` into `.env` and modify variables as needed.
+
+## User Install
+
+- Add later
+
+## Dev Install
+
+Install Python 3.9+
+
+```shell
+pip install poetry
+poetry config virtualenvs.in-project true
+poetry config virtualenvs.in-project true
+poetry install
+```
