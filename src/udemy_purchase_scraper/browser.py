@@ -11,9 +11,7 @@ def startBrowser():
     driver = Driver(
         uc=True, # Undetected Mode
         headed=is_headless, # Headless mode,
-        driver_version=chrome_version, # A version to pin if needed
-        no_sandbox=True, # Run the same as a user instead of sandboxing
-        disable_gpu=not is_headless # Works better when headless
+        driver_version=chrome_version # A version to pin if needed
     )
     if is_headless:
         driver.set_window_size(1920, 1080)
