@@ -1,39 +1,41 @@
-from undetected_chromedriver import By
+from seleniumbase import BaseCase
+from selenium.webdriver.remote.webelement import WebElement
 import os
 import time
 import re
 import src.udemy_purchase_scraper.exceptions as u_ec
 import udemy_purchase_scraper.owned.classes as u_o_cl
+import requests
 
-def getOwnedInformation(course: any) -> any:
+def getOwnedInformation(course: BaseCase) -> u_o_cl.UdemyCourseOwn:
     '''
     
     '''
-    course_info = course.find_element(By.XPATH,".//h3[@data-purpose='course-title-url']//a")
+    course_info: WebElement = course.find_element(".//h3[@data-purpose='course-title-url']//a")
     course_title = course_info.text
     course_link = course_info.get_attribute("href")
-    instructor = course.find_element(By.XPATH, ".//div[@class='course-card-instructors-module--instructor-list--cJTfw']").text
+    instructor: WebElement = course.find_element(".//div[@class='course-card-instructors-module--instructor-list--cJTfw']").text
     instructor = re.split(r"[,\|•-]", instructor)[0].strip()
     cur_purchase = u_o_cl.UdemyCourseOwn(course_name=course_title,
                                          course_link=course_link,
                                          course_author=instructor)
     return(cur_purchase)
 
-def getOwnedPage(driver: any) -> any:
+def getOwnedPage(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
     '''
     
     '''
-    courses_grid = driver.find_element(By.XPATH, "//div[@class='my-courses__course-card-grid']")
-    courses = courses_grid.find_elements(By.XPATH, "./div")
+    courses_grid: WebElement = sb.find_element("//div[@class='my-courses__course-card-grid']")
+    courses: list[WebElement] = courses_grid.find_elements("./div")
     courses = [getOwnedInformation(course=course) for course in courses]
     return(courses)
 
-def checkMoreOwned(driver: any) -> None:
+def checkMoreOwned(sb: BaseCase) -> WebElement:
     '''
     
     '''
     try:
-        next_page = driver.find_element(By.XPATH, ".//a[@class='ud-btn ud-btn-medium ud-btn-secondary ud-btn-round ud-btn-text-sm ud-btn-icon ud-btn-icon-medium ud-btn-icon-round pagination-module--next--QX6nm'" \
+        next_page: WebElement = sb.find_element(".//a[@class='ud-btn ud-btn-medium ud-btn-secondary ud-btn-round ud-btn-text-sm ud-btn-icon ud-btn-icon-medium ud-btn-icon-round pagination-module--next--QX6nm'" \
                                         " and @aria-label='next page' " \
                                         "and @aria-disabled='false']")
         next_page.click()
@@ -41,45 +43,45 @@ def checkMoreOwned(driver: any) -> None:
     except:
         raise u_ec.LastPageError("No more owned pages")
 
-def getOwnedResults(driver: any) -> any:
+def getOwnedResults(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
     """
     
     """
     retry = 0
     while retry < int(os.environ.get("RETRY_LIMIT", 3)):
         try:
-            page_results = getOwnedPage(driver=driver)
+            page_results = getOwnedPage(sb=sb)
             return(page_results)
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     raise u_ec.RetryError("Ran out of retries")
 
-def getOwnedPages(driver: any) -> any:
+def getOwnedPages(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
     """
     
     """
-    driver.get("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
+    sb.get("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     courses = []
     while True:
-        page_results = getOwnedResults(driver=driver)
+        page_results = getOwnedResults(sb=sb)
         courses.extend(page_results)
         try:
-            checkMoreOwned(driver=driver)
+            checkMoreOwned(sb=sb)
         except u_ec.LastPageError:
             break
     return(courses)
 
-def getOwnedCurrentURL(driver: any, course_link: str):
+def getOwnedCurrentURL(sb: BaseCase, course_link: str) -> str:
     """
     x
     """
-    driver.get(course_link)
+    sb.get(course_link)
     #time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
-    return(driver.current_url.split("/learn")[0])
+    return(sb.current_url.split("/learn")[0])
 
-def getOwnedCurrentURLRequest(session: any, course_link: str):
+def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> str:
     """
     x
     """

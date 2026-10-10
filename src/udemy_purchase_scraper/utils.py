@@ -1,10 +1,11 @@
 import requests
+import requests.cookies
 import json
 import os
-import seleniumbase as sb
+from seleniumbase import BaseCase
 import time
 
-def checkForceNewCookies():
+def checkForceNewCookies() -> bool:
     """
     x
     """
@@ -18,7 +19,7 @@ def checkForceNewCookies():
             force_new_cookies = False
     return(force_new_cookies)
 
-def checkHeadless():
+def checkHeadless() -> bool:
     """
     x
     """
@@ -27,7 +28,7 @@ def checkHeadless():
         run_headless = run_headless.lower() == "true"
     return(run_headless)
 
-def checkForcedHeadless():
+def checkForcedHeadless() -> bool:
     """
     x
     """
@@ -36,7 +37,7 @@ def checkForcedHeadless():
     forced_headless = force_new_cookies or run_headless
     return(forced_headless)
 
-def checkChromeVersion():
+def checkChromeVersion() -> int|None:
     """
     x
     """
@@ -52,7 +53,7 @@ def checkChromeVersion():
                 chrome_version = None
     return(chrome_version)
 
-def saveCookies(driver: sb.Chrome, f_path: str, force_cookies: bool = True) -> None:
+def saveCookies(sb: BaseCase, f_path: str, force_cookies: bool = True) -> None:
     '''
     Saves the cookies from your udemy in
 
@@ -73,12 +74,13 @@ def saveCookies(driver: sb.Chrome, f_path: str, force_cookies: bool = True) -> N
         # Wait for an input for the user to log in
         input("Continue after you've logged into Udemy!")
         # To save cookies
-        saved_cookies = driver.get_cookies()
-        with open(f_path, "w") as file:
-            json.dump(saved_cookies, file)
+        # saved_cookies = sb.get_cookies()
+        # with open(f_path, "w") as file:
+        #     json.dump(saved_cookies, file)
+        sb.save_cookies(f_path)
     return None
 
-def loadCookies(driver: sb.Chrome, f_path: str):
+def loadCookies(sb: BaseCase, f_path: str) -> None:
     '''
     Loads your Udemy cookies in
 
@@ -92,15 +94,14 @@ def loadCookies(driver: sb.Chrome, f_path: str):
     :rtype: None
     '''
     # To load in cookies
-    with open(f_path, "r") as file:
-        saved_cookies = json.load(file)
-    for x in saved_cookies:
-        driver.add_cookie(x)
+    # with open(f_path, "r") as file:
+    #     saved_cookies = json.load(file)
+    sb.load_cookies(f_path)
     # Wait for one second just to be sure (probably not needed)
     time.sleep(1)
     return None
 
-def requestsCookiesFromSelenium(cookies_file: str) -> any: #selenium_cookies: dict) -> any:
+def requestsCookiesFromSelenium(cookies_file: str) -> requests.cookies.RequestsCookieJar:
     '''
     x
     '''
