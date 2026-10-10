@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-import undetected_chromedriver as uc
+import seleniumbase as sb
 import time
 
 def checkForceNewCookies():
@@ -18,7 +18,41 @@ def checkForceNewCookies():
             force_new_cookies = False
     return(force_new_cookies)
 
-def saveCookies(driver: uc.Chrome, f_path: str, force_cookies: bool = True) -> None:
+def checkHeadless():
+    """
+    x
+    """
+    run_headless = os.environ.get("HEADLESS", False)
+    if isinstance(run_headless, str):
+        run_headless = run_headless.lower() == "true"
+    return(run_headless)
+
+def checkForcedHeadless():
+    """
+    x
+    """
+    run_headless = checkHeadless()
+    force_new_cookies = checkForceNewCookies()
+    forced_headless = force_new_cookies or run_headless
+    return(forced_headless)
+
+def checkChromeVersion():
+    """
+    x
+    """
+    chrome_version = os.environ.get("CHROME_VERSION", None)
+    if isinstance(chrome_version, str):
+        # I wonder if omitting this conditional would be more efficient
+        if chrome_version.lower() == "none":
+            chrome_version = None
+        else:
+            try:
+                chrome_version = int(chrome_version)
+            except:
+                chrome_version = None
+    return(chrome_version)
+
+def saveCookies(driver: sb.Chrome, f_path: str, force_cookies: bool = True) -> None:
     '''
     Saves the cookies from your udemy in
 
@@ -44,7 +78,7 @@ def saveCookies(driver: uc.Chrome, f_path: str, force_cookies: bool = True) -> N
             json.dump(saved_cookies, file)
     return None
 
-def loadCookies(driver: uc.Chrome, f_path: str):
+def loadCookies(driver: sb.Chrome, f_path: str):
     '''
     Loads your Udemy cookies in
 
