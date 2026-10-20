@@ -3,7 +3,7 @@ from selenium.webdriver.remote.webelement import WebElement
 import os
 import time
 import re
-import src.udemy_purchase_scraper.exceptions as u_ec
+import udemy_purchase_scraper.exceptions as u_ec
 import udemy_purchase_scraper.owned.classes as u_o_cl
 import requests
 

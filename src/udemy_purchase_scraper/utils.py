@@ -74,10 +74,10 @@ def saveCookies(sb: BaseCase, f_path: str, force_cookies: bool = True) -> None:
         # Wait for an input for the user to log in
         input("Continue after you've logged into Udemy!")
         # To save cookies
-        # saved_cookies = sb.get_cookies()
-        # with open(f_path, "w") as file:
-        #     json.dump(saved_cookies, file)
-        sb.save_cookies(f_path)
+        saved_cookies = sb.get_cookies()
+        with open(f_path, "w") as file:
+            json.dump(saved_cookies, file)
+        #sb.save_cookies(f_path) # I don't like thi because it makes a local folder
     return None
 
 def loadCookies(sb: BaseCase, f_path: str) -> None:
@@ -94,9 +94,10 @@ def loadCookies(sb: BaseCase, f_path: str) -> None:
     :rtype: None
     '''
     # To load in cookies
-    # with open(f_path, "r") as file:
-    #     saved_cookies = json.load(file)
-    sb.load_cookies(f_path)
+    with open(f_path, "r") as file:
+        saved_cookies = json.load(file)
+        sb.add_cookies(saved_cookies)
+    #sb.load_cookies(f_path) # I don't like thi because it makes a local folder
     # Wait for one second just to be sure (probably not needed)
     time.sleep(1)
     return None
