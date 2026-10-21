@@ -1,7 +1,7 @@
 from seleniumbase import BaseCase
 from seleniumbase import SB
 from seleniumbase.undetected.cdp_driver.element import Element
-from selenium.webdriver.remote.webelement import WebElement
+#from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 import datetime
 from decimal import Decimal
@@ -102,7 +102,7 @@ def getPurchaseCourseMultiple(sb: BaseCase) -> list[Element]:
     '''
     A function to get the courses from a purchase with multiple courses
     '''
-    courses: list[WebElement] = sb.find_elements("tr[class*='paginated-table_purchase-history-table--sub-row']")
+    courses: list[Element] = sb.find_elements("tr[class*='paginated-table_purchase-history-table--sub-row']")
     courses = [getPurchaseCourseSingle(purchase=course) for course in courses]
     return(courses)
 

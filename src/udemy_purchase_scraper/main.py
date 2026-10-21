@@ -34,6 +34,9 @@ time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
 
 #region Purchase Scraping
 from udemy_purchase_scraper.purchase import scraper as prs
+purchase_result = prs.getPurchasePages(sb=sb)
 
-result = prs.getPurchasePages(sb=sb)
+from udemy_purchase_scraper.owned import scraper as ors
+owned_result = ors.getOwnedPages(sb=sb)
+
 #endregion
