@@ -68,7 +68,7 @@ def getOwnedPages(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
     """
     
     """
-    sb.get("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
+    sb.goto("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     courses = []
     while True:
@@ -84,7 +84,7 @@ def getOwnedCurrentURL(sb: BaseCase, course_link: str) -> str:
     """
     x
     """
-    sb.get(course_link)
+    sb.goto(course_link)
     #time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     return(sb.current_url.split("/learn")[0])
 

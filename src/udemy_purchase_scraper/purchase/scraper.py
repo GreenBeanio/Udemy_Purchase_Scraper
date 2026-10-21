@@ -36,7 +36,7 @@ def getPurchaseInformation(purchase: Element, sb: SB) -> u_p_cl.UdemyPurchase:
     #purchase_number: Element = sb.execute_script("return arg1.parentElement;", purchase_number)
     #purchase_number: Element = sb.execute_script("return arguments.parentElement;", purchase_number)
     #purchase_number: Element = sb.execute_script("(arg1) => { return arg1.parentElement; }", purchase_number)
-    purchase_number: Element = sb.get_parent(purchase_number)
+    purchase_number: Element = sb.goto_parent(purchase_number)
     #purchase_number: str = purchase_number.get_attribute("href")
     #purchase_number: str = purchase_number.get("href")
     purchase_number: str = purchase_number.href
@@ -86,7 +86,7 @@ def getPurchaseCourseSingle(purchase: Element) -> u_p_cl.UdemyCoursePurchase:
     course_name_element: Element = course_name_element.query_selector("a")
     # course_name: str = course_name_element.get_attribute("innerHTML")
     # course_link: str = course_name_element.get_attribute("href")
-    # course_name: str = sb.get_attribute(course_name_element, "innerHTML")
+    # course_name: str = sb.goto_attribute(course_name_element, "innerHTML")
     # course_name: str = course_name_element.evaluate("this.innerHTML")
     course_name: str = course_name_element.get_html()
     course_link: str = course_name_element.href
@@ -160,7 +160,7 @@ def getPurchasePages(sb: BaseCase) -> list[u_p_cl.UdemyPurchase]:
     """
     A function to get the purchase results from all pages
     """
-    sb.get("https://www.udemy.com/dashboard/purchase-history/")
+    sb.goto("https://www.udemy.com/dashboard/purchase-history/")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     purchases: list[u_p_cl.UdemyPurchase] = []
     while True:

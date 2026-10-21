@@ -6,3 +6,9 @@ class SingleCourseError(Exception):
 
 class LastPageError(Exception):
     '''Raised when there are no more purchase pages'''
+
+class BadCookies(Exception):
+    '''Raised when the cookies are bad'''
+
+class NeedHead(Exception):
+    '''Raised when in headless mode but headed is needed'''

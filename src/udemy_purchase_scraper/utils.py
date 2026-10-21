@@ -4,6 +4,11 @@ import json
 import os
 from seleniumbase import BaseCase
 import time
+import pickle
+import udemy_purchase_scraper.purchase.classes as u_p_cl
+import udemy_purchase_scraper.owned.classes as u_o_cl
+import udemy_purchase_scraper.exceptions as u_ec
+from pathlib import Path
 
 def checkForceNewCookies() -> bool:
     """
@@ -28,14 +33,14 @@ def checkHeadless() -> bool:
         run_headless = run_headless.lower() == "true"
     return(run_headless)
 
-def checkForcedHeadless() -> bool:
+def checkUseHeadless() -> bool:
     """
     x
     """
     run_headless = checkHeadless()
     force_new_cookies = checkForceNewCookies()
-    forced_headless = force_new_cookies or run_headless
-    return(forced_headless)
+    headless_status = not force_new_cookies and run_headless
+    return(headless_status)
 
 def checkChromeVersion() -> int|None:
     """
@@ -53,52 +58,40 @@ def checkChromeVersion() -> int|None:
                 chrome_version = None
     return(chrome_version)
 
-def saveCookies(sb: BaseCase, f_path: str, force_cookies: bool = True) -> None:
+def saveCookies(sb: BaseCase) -> None:
     '''
     Saves the cookies from your udemy in
 
     :param driver: The web driver
     :type driver: Chrome
 
-    :param f_path: The file name (or full file path)
-    :type f_path: str
-
-    :param force_cookies: If we force the cookies even if they already exist, defaults to [True]
-    :type force_cookies: bool
-
     :return: Nothing
     :rtype: None
     '''
-    # Checking if the cookies file already exists
-    if(force_cookies or not os.path.exists(f_path)):
-        # Wait for an input for the user to log in
-        input("Continue after you've logged into Udemy!")
-        # To save cookies
-        saved_cookies = sb.get_cookies()
-        with open(f_path, "w") as file:
-            json.dump(saved_cookies, file)
-        #sb.save_cookies(f_path) # I don't like thi because it makes a local folder
-    return None
+    cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
+    input("Continue after you've logged into Udemy!")
+    saved_cookies = sb.goto_cookies()
+    with open(cookies_path, "w") as file:
+        json.dump(saved_cookies, file)
 
-def loadCookies(sb: BaseCase, f_path: str) -> None:
+def loadCookies(sb: BaseCase) -> None:
     '''
     Loads your Udemy cookies in
 
     :param driver: The web driver
     :type driver: Chrome
 
-    :param f_path: The file name (or full file path)
-    :type f_path: str
-
     :return: Nothing
     :rtype: None
     '''
-    # To load in cookies
-    with open(f_path, "r") as file:
+    cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
+    if not cookies_path.exists():
+        raise u_ec.BadCookies("Cookies file does not exist")
+    with open(cookies_path, "r") as file:
         saved_cookies = json.load(file)
         sb.add_cookies(saved_cookies)
-    #sb.load_cookies(f_path) # I don't like thi because it makes a local folder
-    # Wait for one second just to be sure (probably not needed)
+    #sb.load_cookies(cookies_path) # I don't like this because it makes a local folder
+
     time.sleep(1)
     return None
 
@@ -128,3 +121,43 @@ def requestsCookiesFromSelenium(cookies_file: str) -> requests.cookies.RequestsC
                 )
             )
     return(jar)
+
+def savePurchases(purchase_data: list[u_p_cl.UdemyPurchase]) -> None:
+    '''
+    x
+    '''
+    # I'm not going to validate this at all, best of luck
+    data_path = Path(os.environ.get("PUR_PATH", "purchases.pkl"))
+    with open(data_path, "wb") as save_file:
+        pickle.dump(purchase_data, save_file)
+
+def saveOwned(owned_data: list[u_o_cl.UdemyCourseOwn]) -> None:
+    '''
+    x
+    '''
+    data_path = Path(os.environ.get("OWN_PATH", "owned.pkl"))
+    with open(data_path, "wb") as save_file:
+        pickle.dump(owned_data, save_file)
+
+def loadPurchases() -> list[u_p_cl.UdemyPurchase]:
+    '''
+    x
+    '''
+    data_path = Path(os.environ.get("PUR_PATH", "purchases.pkl"))
+    if not os.path.exists(data_path):
+        raise FileNotFoundError("Purchases file does not exist")
+    with open("backup_data.pkl", "rb") as load_file:
+        data_load = pickle.load(load_file)
+        return(data_load)
+
+def loadOwned() -> list[u_o_cl.UdemyCourseOwn]:
+    '''
+    x
+    '''
+    data_path = Path(os.environ.get("OWN_PATH", "purchases.pkl"))
+    if not os.path.exists(data_path):
+        raise FileNotFoundError("Owned file does not exist")
+
+    with open("backup_data.pkl", "rb") as load_file:
+        data_load = pickle.load(load_file)
+        return(data_load)
