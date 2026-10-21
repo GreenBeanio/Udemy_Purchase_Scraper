@@ -92,11 +92,12 @@ def loadCookies(sb: BaseCase) -> None:
     time.sleep(1)
     return None
 
-def requestsCookiesFromSelenium(cookies_file: str) -> requests.cookies.RequestsCookieJar:
+def requestsCookiesFromSelenium() -> requests.cookies.RequestsCookieJar:
     '''
     x
     '''
-    with open(cookies_file, "r") as file:
+    cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
+    with open(cookies_path, "r") as file:
         saved_cookies = json.load(file)
     jar = requests.cookies.RequestsCookieJar()
     for cookie in saved_cookies:
@@ -137,7 +138,7 @@ def loadPurchases() -> list[UdemyPurchase]:
     data_path = Path(os.environ.get("PUR_PATH", "purchases.pkl"))
     if not os.path.exists(data_path):
         raise FileNotFoundError("Purchases file does not exist")
-    with open("backup_data.pkl", "rb") as load_file:
+    with open(data_path, "rb") as load_file:
         data_load = pickle.load(load_file)
         return(data_load)
 
@@ -145,10 +146,25 @@ def loadOwned() -> list[UdemyCourseOwn]:
     '''
     x
     '''
-    data_path = Path(os.environ.get("OWN_PATH", "purchases.pkl"))
+    data_path = Path(os.environ.get("OWN_PATH", "owned.pkl"))
     if not os.path.exists(data_path):
         raise FileNotFoundError("Owned file does not exist")
 
-    with open("backup_data.pkl", "rb") as load_file:
+    with open(data_path, "rb") as load_file:
         data_load = pickle.load(load_file)
         return(data_load)
+
+def uniqueCourses(courses: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
+    '''
+    x
+    '''
+    unique_courses = {}
+    ind = 0
+    while ind < len(courses):
+        c_link = courses[ind].course_link
+        if(c_link not in unique_courses):
+            unique_courses[c_link] = None
+            ind = ind + 1
+        else:
+            del courses[ind]
+    return(courses)

@@ -6,6 +6,7 @@ import re
 from udemy_purchase_scraper.exceptions import LastPageError, RetryError
 from udemy_purchase_scraper.owned.classes import UdemyCourseOwn
 import requests
+from udemy_purchase_scraper.utils import requestsCookiesFromSelenium
 
 def getOwnedInformation(course: Element) -> UdemyCourseOwn:
     '''
@@ -13,7 +14,7 @@ def getOwnedInformation(course: Element) -> UdemyCourseOwn:
     '''
     course_info: Element = course.query_selector("h3[data-purpose='course-title-url'] a")
     course_title = course_info.text
-    course_link = course_info.href
+    course_link = f"https://www.udemy.com{course_info.href}"
     instructor: Element = course.query_selector("div[class*='course-card-instructors-module--instructor-list']").text
     instructor = re.split(r"[,\|•-]", instructor)[0].strip()
     cur_purchase = UdemyCourseOwn(course_name=course_title,
@@ -92,3 +93,13 @@ def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> st
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     raise RetryError("Ran out of retries")
+
+def getOwnedCurrentURLs(owned: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
+    """
+    x
+    """
+    requests_cookies = requestsCookiesFromSelenium()
+    with requests.Session() as session:
+        session.cookies = requests_cookies
+        for ind, course in enumerate(owned):
+            owned[ind].course_page = f"{getOwnedCurrentURLRequest(session=session, course_link=course.course_link)}/"

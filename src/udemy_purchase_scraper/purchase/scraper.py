@@ -113,11 +113,13 @@ def checkMorePurchases(sb: BaseCase) -> None:
     '''
     A function to check if a purchase has multiple courses
     '''
-    next_page: Element = sb.find_element("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
-    if next_page is None:
+    try:
+        next_page: Element = sb.find_element("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
+        next_page.click()
+        time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+    except:
         raise LastPageError("No more purchase pages")
-    next_page.click()
-    time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+
 
 def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
     """
