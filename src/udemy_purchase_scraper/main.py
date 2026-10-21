@@ -4,7 +4,7 @@ from udemy_purchase_scraper.utils import saveOwned, savePurchases
 from udemy_purchase_scraper.login import checkLogin
 from udemy_purchase_scraper.owned.tasks import taskOwned
 from udemy_purchase_scraper.purchase.tasks import taskPurchases
-from concurrent.futures import ThreadPoolExecutor, wait, as_completed
+from concurrent.futures import ThreadPoolExecutor, wait, as_completed, FIRST_COMPLETED
 import sys
 #endregion
 
@@ -28,27 +28,44 @@ checkLogin()
 #     owned = owned.result()
 
 from udemy_purchase_scraper.utils import uniqueCourses
-import requests
-from udemy_purchase_scraper.utils import requestsCookiesFromSelenium
-from udemy_purchase_scraper.owned.scraper import getOwnedCurrentURLRequest
+from udemy_purchase_scraper.owned.scraper import getOwnedCurrentURLs
+
+# with ThreadPoolExecutor(max_workers=2) as executor:
+#     futures_map = {
+#         executor.submit(taskPurchases): "purchases",
+#         executor.submit(taskOwned): "owned"
+#     }
+#     final_result = {}
+#     for future in as_completed(futures_map):
+#         if futures_map[future] == "owned":
+#             owned = uniqueCourses(future.result())
+#             final_result["owned"] = getOwnedCurrentURLs(owned)
+#         else:
+#             final_result["purchases"] = future.result()
 
 with ThreadPoolExecutor(max_workers=2) as executor:
     futures_map = {
         executor.submit(taskPurchases): "purchases",
         executor.submit(taskOwned): "owned"
     }
-    for future in as_completed(futures_map):
-        if futures_map[future] == "owned":
-            owned = uniqueCourses(future.result())
-            requests_cookies = requestsCookiesFromSelenium()
-            with requests.Session() as session:
-                session.cookies = requests_cookies
-                for ind, course in enumerate(owned):
-                    owned[ind].course_page = f"{getOwnedCurrentURLRequest(session=session, course_link=course.course_link)}/"
-        else:
-            purchases = future.result()
-            
+    final_result = {}
+    while futures_map:
+        done, _ = wait(futures_map.keys(), return_when=FIRST_COMPLETED)
+        for future in done:
+            current_future = futures_map.pop(future)
+            # Should be simple enough logic to not need a state machine or registry type pattern
+            if current_future == "owned":
+                url_future = executor.submit(uniqueCourses, future.result())
+                futures_map[url_future] = "unique"
+            elif current_future == "unique":
+                url_future = executor.submit(getOwnedCurrentURLs, future.result())
+                futures_map[url_future] = "url"
+            elif current_future == "url":
+                final_result["owned"] = future.result()
+            else:
+                final_result["purchases"] = future.result()
+
 #endregion
 
-# savePurchases(purchases)
-# saveOwned(owned)
+savePurchases(final_result["purchases"])
+saveOwned(final_result["owned"])
