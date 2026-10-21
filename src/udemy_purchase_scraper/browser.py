@@ -12,7 +12,6 @@ def startBrowser() -> Generator[SB, None, None]:
     is_headless = us_u.checkUseHeadless()
     chrome_version = us_u.checkChromeVersion()
     if is_headless:
-        print("no show")
         with SB(
                 #browser="chrome", # Sets Chrome, default in uc mode
                 incognito=True, # Hides past session/profile info
@@ -26,7 +25,6 @@ def startBrowser() -> Generator[SB, None, None]:
             ) as sb:
                 yield(sb)
     else:
-        print("show")
         with SB(
                 #browser="chrome", # Sets Chrome, default in uc mode
                 incognito=True, # Hides past session/profile info

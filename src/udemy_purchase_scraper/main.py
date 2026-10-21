@@ -14,6 +14,21 @@ import time
 import os
 from pathlib import Path
 
+def watchLogin(sb: BaseCase) -> None:
+    """
+    x
+    """
+    sb.maximize()
+    sb.execute_script("alert('Login to Udemy to continue');")
+    while True:
+        login_button = sb.is_element_present("a[data-purpose='header-login']")
+        if login_button:
+            time.sleep(5)
+        else:
+            break
+    saveCookies(sb=sb)
+             
+
 def attemptLogin() -> None:
     """
     x
@@ -27,17 +42,14 @@ def attemptLogin() -> None:
         if checkForceNewCookies():
             if checkUseHeadless():
                 raise NeedHead("In headless mode but need headed for login")
-            sb.maximize()
-            saveCookies(sb=sb)
+            watchLogin(sb=sb)
         else:
             try:
                 loadCookies(sb=sb)
-            except :#BadCookies:
-                # Just relogin for any error not just BadCookies
+            except :#BadCookies: # Just relogin for any error not just BadCookies
                 if checkUseHeadless():
                     raise NeedHead("In headless mode but need headed for login")
-                sb.maximize()
-                saveCookies(sb=sb)
+                watchLogin(sb=sb)
 
         sb.refresh()
         time.sleep(int(os.environ.get("SLEEP_TIME", 3)))

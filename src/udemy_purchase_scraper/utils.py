@@ -69,8 +69,7 @@ def saveCookies(sb: BaseCase) -> None:
     :rtype: None
     '''
     cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
-    input("Continue after you've logged into Udemy!")
-    saved_cookies = sb.goto_cookies()
+    saved_cookies = sb.get_cookies()
     with open(cookies_path, "w") as file:
         json.dump(saved_cookies, file)
 
