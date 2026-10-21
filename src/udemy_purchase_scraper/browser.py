@@ -1,5 +1,5 @@
 from seleniumbase import SB
-import udemy_purchase_scraper.utils as us_u
+from udemy_purchase_scraper.utils import checkUseHeadless, checkChromeVersion
 from contextlib import contextmanager
 from collections.abc import Generator
 
@@ -8,8 +8,8 @@ def startBrowser() -> Generator[SB, None, None]:
     """
     x
     """
-    is_headless = us_u.checkUseHeadless()
-    chrome_version = us_u.checkChromeVersion()
+    is_headless = checkUseHeadless()
+    chrome_version = checkChromeVersion()
     if is_headless:
         with SB(
                 incognito=True, # Hides past session/profile info

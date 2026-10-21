@@ -5,9 +5,9 @@ import os
 from seleniumbase import BaseCase
 import time
 import pickle
-import udemy_purchase_scraper.purchase.classes as u_p_cl
-import udemy_purchase_scraper.owned.classes as u_o_cl
-import udemy_purchase_scraper.exceptions as u_ec
+from udemy_purchase_scraper.purchase.classes import UdemyPurchase
+from udemy_purchase_scraper.owned.classes import UdemyCourseOwn
+from udemy_purchase_scraper.exceptions import BadCookies
 from pathlib import Path
 
 def checkForceNewCookies() -> bool:
@@ -84,7 +84,7 @@ def loadCookies(sb: BaseCase) -> None:
     '''
     cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
     if not cookies_path.exists():
-        raise u_ec.BadCookies("Cookies file does not exist")
+        raise BadCookies("Cookies file does not exist")
     with open(cookies_path, "r") as file:
         saved_cookies = json.load(file)
         sb.add_cookies(saved_cookies)
@@ -114,7 +114,7 @@ def requestsCookiesFromSelenium(cookies_file: str) -> requests.cookies.RequestsC
             )
     return(jar)
 
-def savePurchases(purchase_data: list[u_p_cl.UdemyPurchase]) -> None:
+def savePurchases(purchase_data: list[UdemyPurchase]) -> None:
     '''
     x
     '''
@@ -122,7 +122,7 @@ def savePurchases(purchase_data: list[u_p_cl.UdemyPurchase]) -> None:
     with open(data_path, "wb") as save_file:
         pickle.dump(purchase_data, save_file)
 
-def saveOwned(owned_data: list[u_o_cl.UdemyCourseOwn]) -> None:
+def saveOwned(owned_data: list[UdemyCourseOwn]) -> None:
     '''
     x
     '''
@@ -130,7 +130,7 @@ def saveOwned(owned_data: list[u_o_cl.UdemyCourseOwn]) -> None:
     with open(data_path, "wb") as save_file:
         pickle.dump(owned_data, save_file)
 
-def loadPurchases() -> list[u_p_cl.UdemyPurchase]:
+def loadPurchases() -> list[UdemyPurchase]:
     '''
     x
     '''
@@ -141,7 +141,7 @@ def loadPurchases() -> list[u_p_cl.UdemyPurchase]:
         data_load = pickle.load(load_file)
         return(data_load)
 
-def loadOwned() -> list[u_o_cl.UdemyCourseOwn]:
+def loadOwned() -> list[UdemyCourseOwn]:
     '''
     x
     '''

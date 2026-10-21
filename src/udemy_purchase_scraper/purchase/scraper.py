@@ -5,8 +5,8 @@ import datetime
 from decimal import Decimal
 import os
 import time
-import udemy_purchase_scraper.exceptions as u_ec
-import udemy_purchase_scraper.purchase.classes as u_p_cl
+from udemy_purchase_scraper.exceptions import SingleCourseError, RetryError, LastPageError
+from udemy_purchase_scraper.purchase.classes import UdemyPurchase, UdemyCoursePurchase
 
 def getPurchasePage(sb: BaseCase) -> list[Element]:
     '''
@@ -16,7 +16,7 @@ def getPurchasePage(sb: BaseCase) -> list[Element]:
     purchases: list[Element] = purchase_table.query_selector_all("tr[class*='paginated-table_purchase-history-table--main-row']")
     return(purchases)
 
-def getPurchaseInformation(purchase: Element, sb: SB) -> u_p_cl.UdemyPurchase:
+def getPurchaseInformation(purchase: Element, sb: SB) -> UdemyPurchase:
     '''
     
     '''
@@ -25,7 +25,7 @@ def getPurchaseInformation(purchase: Element, sb: SB) -> u_p_cl.UdemyPurchase:
         if c_pur.text == "Receipt":
             purchase_number: Element = c_pur
             break
-    purchase_number: Element = sb.goto_parent(purchase_number)
+    purchase_number: Element = sb.get_parent(purchase_number)
     purchase_number: str = purchase_number.href
     purchase_number: str = purchase_number.split("/")[-2]
     purchase_cost: str = purchase.query_selector("div[class*='paginated-table_purchase-history-table--data-cell'] > div[class*='app_positive-text']").text
@@ -37,7 +37,7 @@ def getPurchaseInformation(purchase: Element, sb: SB) -> u_p_cl.UdemyPurchase:
             purchase_date: str = c_date.text
             break
     purchase_date: datetime.date = datetime.datetime.strptime(purchase_date, "%b %d, %Y").date()
-    cur_purchase = u_p_cl.UdemyPurchase(purchase_number=purchase_number,
+    cur_purchase = UdemyPurchase(purchase_number=purchase_number,
                                         purchase_cost= purchase_cost,
                                         purchase_date=purchase_date)
     return(cur_purchase)
@@ -49,10 +49,10 @@ def checkMultipleCourses(purchase: Element) -> Element:
     link_section: Element = purchase.query_selector("div[class*='paginated-table_purchase-details--text-container']")
     show_more_button: Element = link_section.query_selector("button[class*='show-more_focusable-label']")
     if show_more_button is None:
-        raise u_ec.SingleCourseError("Purchase only has a single course")
+        raise SingleCourseError("Purchase only has a single course")
     return(show_more_button)
 
-def getPurchaseCourseSingle(purchase: Element) -> u_p_cl.UdemyCoursePurchase:
+def getPurchaseCourseSingle(purchase: Element) -> UdemyCoursePurchase:
     '''
     A function to get the courses from a purchase with a single course
     '''
@@ -62,7 +62,7 @@ def getPurchaseCourseSingle(purchase: Element) -> u_p_cl.UdemyCoursePurchase:
     course_link: str = course_name_element.href
     course_price: str = purchase.query_selector("div[class*='app_positive-text']").text
     course_price: Decimal = Decimal(course_price.replace("$","").strip())
-    course = u_p_cl.UdemyCoursePurchase(course_name=course_name,
+    course = UdemyCoursePurchase(course_name=course_name,
                                         course_link=course_link,
                                         course_cost=course_price)
     return(course)
@@ -75,7 +75,7 @@ def getPurchaseCourseMultiple(sb: BaseCase) -> list[Element]:
     courses = [getPurchaseCourseSingle(purchase=course) for course in courses]
     return(courses)
 
-def getPurchaseCourses(purchase: any, sb: BaseCase) -> list[u_p_cl.UdemyCoursePurchase]:
+def getPurchaseCourses(purchase: any, sb: BaseCase) -> list[UdemyCoursePurchase]:
     '''
     A function to get the courses in a purchase
     '''
@@ -86,11 +86,11 @@ def getPurchaseCourses(purchase: any, sb: BaseCase) -> list[u_p_cl.UdemyCoursePu
         courses = getPurchaseCourseMultiple(sb=sb)
         expand_purchase.click()
         time.sleep(int(os.environ.get("SLEEP_TIME", 3))/2)
-    except u_ec.SingleCourseError:
+    except SingleCourseError:
         courses = [getPurchaseCourseSingle(purchase)]
     return(courses)
 
-def getPurchasePageResults(sb: BaseCase) -> list[u_p_cl.UdemyPurchase]:
+def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
     """
     A function to get the results from a page of purchases
     """
@@ -107,30 +107,30 @@ def getPurchasePageResults(sb: BaseCase) -> list[u_p_cl.UdemyPurchase]:
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
-    raise u_ec.RetryError("Ran out of retries")
+    raise RetryError("Ran out of retries")
 
 def checkMorePurchases(sb: BaseCase) -> None:
     '''
     A function to check if a purchase has multiple courses
     '''
-    next_page: Element = sb.is_element_present("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
-    if not next_page:
-        raise u_ec.LastPageError("No more purchase pages")
+    next_page: Element = sb.find_element("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
+    if next_page is None:
+        raise LastPageError("No more purchase pages")
     next_page.click()
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
 
-def getPurchasePages(sb: BaseCase) -> list[u_p_cl.UdemyPurchase]:
+def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
     """
     A function to get the purchase results from all pages
     """
     sb.goto("https://www.udemy.com/dashboard/purchase-history/")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
-    purchases: list[u_p_cl.UdemyPurchase] = []
+    purchases: list[UdemyPurchase] = []
     while True:
         page_results = getPurchasePageResults(sb)
         purchases.extend(page_results)
         try:
             checkMorePurchases(sb=sb)
-        except u_ec.LastPageError:
+        except LastPageError:
             break
     return(purchases)

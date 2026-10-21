@@ -3,11 +3,11 @@ from seleniumbase.undetected.cdp_driver.element import Element
 import os
 import time
 import re
-import udemy_purchase_scraper.exceptions as u_ec
-import udemy_purchase_scraper.owned.classes as u_o_cl
+from udemy_purchase_scraper.exceptions import LastPageError, RetryError
+from udemy_purchase_scraper.owned.classes import UdemyCourseOwn
 import requests
 
-def getOwnedInformation(course: Element) -> u_o_cl.UdemyCourseOwn:
+def getOwnedInformation(course: Element) -> UdemyCourseOwn:
     '''
     
     '''
@@ -16,12 +16,12 @@ def getOwnedInformation(course: Element) -> u_o_cl.UdemyCourseOwn:
     course_link = course_info.href
     instructor: Element = course.query_selector("div[class*='course-card-instructors-module--instructor-list']").text
     instructor = re.split(r"[,\|•-]", instructor)[0].strip()
-    cur_purchase = u_o_cl.UdemyCourseOwn(course_name=course_title,
+    cur_purchase = UdemyCourseOwn(course_name=course_title,
                                          course_link=course_link,
                                          course_author=instructor)
     return(cur_purchase)
 
-def getOwnedPage(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
+def getOwnedPage(sb: BaseCase) -> list[UdemyCourseOwn]:
     '''
     
     '''
@@ -39,9 +39,9 @@ def checkMoreOwned(sb: BaseCase) -> Element:
         next_page.click()
         time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     except:
-        raise u_ec.LastPageError("No more owned pages")
+        raise LastPageError("No more owned pages")
 
-def getOwnedResults(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
+def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
     """
     
     """
@@ -53,9 +53,9 @@ def getOwnedResults(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
-    raise u_ec.RetryError("Ran out of retries")
+    raise RetryError("Ran out of retries")
 
-def getOwnedPages(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
+def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
     """
     
     """
@@ -67,7 +67,7 @@ def getOwnedPages(sb: BaseCase) -> list[u_o_cl.UdemyCourseOwn]:
         courses.extend(page_results)
         try:
             checkMoreOwned(sb=sb)
-        except u_ec.LastPageError:
+        except LastPageError:
             break
     return(courses)
 
@@ -91,4 +91,4 @@ def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> st
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
-    raise u_ec.RetryError("Ran out of retries")
+    raise RetryError("Ran out of retries")
