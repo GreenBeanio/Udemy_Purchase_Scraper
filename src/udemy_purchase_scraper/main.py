@@ -1,18 +1,17 @@
 #region Imports
 from udemy_purchase_scraper import browser
 from dotenv import load_dotenv
-from seleniumbase import SB, BaseCase, Driver
-#endregion
-
-#region Load Settings
-load_dotenv()
-#endregion
-
+from seleniumbase import BaseCase
 from udemy_purchase_scraper.utils import checkForceNewCookies, saveCookies, loadCookies, checkHeadless, checkUseHeadless
 from udemy_purchase_scraper.exceptions import BadCookies, RetryError, NeedHead
 import time
 import os
 from pathlib import Path
+#endregion
+
+#region Load Settings
+load_dotenv()
+#endregion
 
 def watchLogin(sb: BaseCase) -> None:
     """
@@ -28,7 +27,6 @@ def watchLogin(sb: BaseCase) -> None:
             break
     saveCookies(sb=sb)
              
-
 def attemptLogin() -> None:
     """
     x
@@ -46,7 +44,7 @@ def attemptLogin() -> None:
         else:
             try:
                 loadCookies(sb=sb)
-            except :#BadCookies: # Just relogin for any error not just BadCookies
+            except :
                 if checkUseHeadless():
                     raise NeedHead("In headless mode but need headed for login")
                 watchLogin(sb=sb)
@@ -54,11 +52,8 @@ def attemptLogin() -> None:
         sb.refresh()
         time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
 
-        #login_button = sb.find_element("a[data-purpose='header-login']")
-        #login_button = sb.find_element("a[data-purpose='header-login']", timeout = 0)
-        #login_button = sb.is_element_visible("a[data-purpose='header-login']")
         login_button = sb.is_element_present("a[data-purpose='header-login']")
-        #if login_button is not None:
+
         if login_button:
             cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
             cookies_path.unlink()

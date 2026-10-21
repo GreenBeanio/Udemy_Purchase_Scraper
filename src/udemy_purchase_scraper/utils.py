@@ -48,7 +48,6 @@ def checkChromeVersion() -> int|None:
     """
     chrome_version = os.environ.get("CHROME_VERSION", None)
     if isinstance(chrome_version, str):
-        # I wonder if omitting this conditional would be more efficient
         if chrome_version.lower() == "none":
             chrome_version = None
         else:
@@ -89,7 +88,6 @@ def loadCookies(sb: BaseCase) -> None:
     with open(cookies_path, "r") as file:
         saved_cookies = json.load(file)
         sb.add_cookies(saved_cookies)
-    #sb.load_cookies(cookies_path) # I don't like this because it makes a local folder
 
     time.sleep(1)
     return None
@@ -111,11 +109,6 @@ def requestsCookiesFromSelenium(cookies_file: str) -> requests.cookies.RequestsC
                     name = cookie.get("name"),
                     value = cookie.get("value"),
                     domain = cookie.get("domain"),
-                    #expiry = cookie.get("expiry"),
-                    #httpOnly = cookie.get("httpOnly"),
-                    #path = cookie.get("path"),
-                    #sameSite = cookie.get("sameSite"),
-                    #secure = cookie.get("secure")
                     rest = rest  
                 )
             )
@@ -125,7 +118,6 @@ def savePurchases(purchase_data: list[u_p_cl.UdemyPurchase]) -> None:
     '''
     x
     '''
-    # I'm not going to validate this at all, best of luck
     data_path = Path(os.environ.get("PUR_PATH", "purchases.pkl"))
     with open(data_path, "wb") as save_file:
         pickle.dump(purchase_data, save_file)

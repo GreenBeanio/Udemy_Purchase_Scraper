@@ -1,8 +1,6 @@
 from seleniumbase import BaseCase
 from seleniumbase import SB
 from seleniumbase.undetected.cdp_driver.element import Element
-#from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.common.by import By
 import datetime
 from decimal import Decimal
 import os
@@ -14,9 +12,7 @@ def getPurchasePage(sb: BaseCase) -> list[Element]:
     '''
     A function to get the purchases from the 'purchase-history' page
     '''
-    #purchase_table: Element = sb.find_element("//table[@class='paginated-table_purchase-history-table__ncCll']")
     purchase_table: Element = sb.find_element("table[class*='paginated-table_purchase-history-table']")
-    #purchases: list[Element] = purchase_table.find_elements_by_xpath(".//tr[@class='paginated-table_purchase-history-table--main-row__5hHCb']")
     purchases: list[Element] = purchase_table.query_selector_all("tr[class*='paginated-table_purchase-history-table--main-row']")
     return(purchases)
 
@@ -24,31 +20,19 @@ def getPurchaseInformation(purchase: Element, sb: SB) -> u_p_cl.UdemyPurchase:
     '''
     
     '''
-    #purchase_number: Element = purchase.find_element_by_xpath(".//span[@class='ud-btn-label' and contains(., 'Receipt')]")
-    #purchase_number: Element = purchase_number.find_element_by_xpath("..")
-    #purchase_number: Element = purchase.query_selector('span.ud-btn-label:contains("Receipt")')
     purchase_number: Element = purchase.query_selector_all('span.ud-btn-label')
     for c_pur in purchase_number:
         if c_pur.text == "Receipt":
             purchase_number: Element = c_pur
             break
-    #purchase_number: Element = sb.execute_script("return arguments[0].parentElement;", purchase_number)
-    #purchase_number: Element = sb.execute_script("return arg1.parentElement;", purchase_number)
-    #purchase_number: Element = sb.execute_script("return arguments.parentElement;", purchase_number)
-    #purchase_number: Element = sb.execute_script("(arg1) => { return arg1.parentElement; }", purchase_number)
     purchase_number: Element = sb.goto_parent(purchase_number)
-    #purchase_number: str = purchase_number.get_attribute("href")
-    #purchase_number: str = purchase_number.get("href")
     purchase_number: str = purchase_number.href
     purchase_number: str = purchase_number.split("/")[-2]
-    #purchase_cost: str = purchase.find_element_by_xpath(".//div[@class='paginated-table_purchase-history-table--data-cell__LO_7L']/div[@class='app_positive-text___Wb07']").text
     purchase_cost: str = purchase.query_selector("div[class*='paginated-table_purchase-history-table--data-cell'] > div[class*='app_positive-text']").text
     purchase_cost: Decimal = Decimal(purchase_cost.replace("$","").strip())
-    #purchase_date: str = purchase.find_element_by_xpath(".//div[@class='paginated-table_purchase-history-table--data-cell__LO_7L' and not(descendant::*)]").text
     purchase_dates: list[Element] = purchase.query_selector_all("div[class*='paginated-table_purchase-history-table--data-cell']")
-    # Could also probably just grabthe second index    
+    # Could also probably just grab the second index    
     for c_date in purchase_dates:
-        #if len(c_date.query_selector_all("> *")) == 0:
         if len(c_date.query_selector_all("*")) == 0:
             purchase_date: str = c_date.text
             break
@@ -62,35 +46,20 @@ def checkMultipleCourses(purchase: Element) -> Element:
     '''
     A function to check if a purchase has multiple courses
     '''
-    try:
-        #link_section: Element = purchase.find_element_by_xpath(".//div[@class='paginated-table_purchase-details--text-container__EvFRz']")
-        #show_more_button: Element = link_section.find_element_by_xpath(".//button[@class='ud-btn ud-btn-medium ud-btn-link ud-btn-text-sm show-more_focusable-label__dmEhW']")
-        link_section: Element = purchase.query_selector("div[class*='paginated-table_purchase-details--text-container']")
-        show_more_button: Element = link_section.query_selector("button[class*='show-more_focusable-label']")
-        # show_more_button: Element = link_section.query_selector("div[class*='paginated-table_purchase-details--text-container'] button[class*='show-more_focusable-label']")
-        # The element from the cpa seems to work differently than the regular selenium, so it will return none instead of erroring out.
-        # I will leave the try-except for now since it might still occur at some point.
-        if show_more_button is None:
-            raise u_ec.SingleCourseError("Purchase only has a single course")
-        return(show_more_button)
-    except:
+    link_section: Element = purchase.query_selector("div[class*='paginated-table_purchase-details--text-container']")
+    show_more_button: Element = link_section.query_selector("button[class*='show-more_focusable-label']")
+    if show_more_button is None:
         raise u_ec.SingleCourseError("Purchase only has a single course")
+    return(show_more_button)
 
 def getPurchaseCourseSingle(purchase: Element) -> u_p_cl.UdemyCoursePurchase:
     '''
     A function to get the courses from a purchase with a single course
     '''
-    #course_name_element: Element = purchase.find_element_by_xpath(".//div[@class='paginated-table_purchase-details--text__JKVm6 paginated-table_purchase-details--content-title-text__DxDuf ud-text-md']")
-    #course_name_element: Element = course_name_element.find_element_by_xpath(".//a")
     course_name_element: Element = purchase.query_selector("div[class*='paginated-table_purchase-details--content-title-text']")
     course_name_element: Element = course_name_element.query_selector("a")
-    # course_name: str = course_name_element.get_attribute("innerHTML")
-    # course_link: str = course_name_element.get_attribute("href")
-    # course_name: str = sb.goto_attribute(course_name_element, "innerHTML")
-    # course_name: str = course_name_element.evaluate("this.innerHTML")
     course_name: str = course_name_element.get_html()
     course_link: str = course_name_element.href
-    #course_price: str = purchase.find_element_by_xpath(".//div[@class='app_positive-text___Wb07']").text
     course_price: str = purchase.query_selector("div[class*='app_positive-text']").text
     course_price: Decimal = Decimal(course_price.replace("$","").strip())
     course = u_p_cl.UdemyCoursePurchase(course_name=course_name,
@@ -144,17 +113,11 @@ def checkMorePurchases(sb: BaseCase) -> None:
     '''
     A function to check if a purchase has multiple courses
     '''
-    try:
-        #next_page: Element = sb.find_element("//a[contains(@class, 'pagination_next') and @aria-label='next page' and @aria-disabled='false']")
-        # XPath isn't working for whatever reason with the sb, but it does in F12, I'll just use CSS
-        next_page: Element = sb.find_element("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
-        # Check for none because cpd is different than base selenium and returns none instead of raising an exception
-        if next_page is None:
-            raise u_ec.LastPageError("No more purchase pages")
-        next_page.click()
-        time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
-    except:
+    next_page: Element = sb.is_element_present("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
+    if not next_page:
         raise u_ec.LastPageError("No more purchase pages")
+    next_page.click()
+    time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
 
 def getPurchasePages(sb: BaseCase) -> list[u_p_cl.UdemyPurchase]:
     """
@@ -165,7 +128,6 @@ def getPurchasePages(sb: BaseCase) -> list[u_p_cl.UdemyPurchase]:
     purchases: list[u_p_cl.UdemyPurchase] = []
     while True:
         page_results = getPurchasePageResults(sb)
-        #purchases.append(page_results)
         purchases.extend(page_results)
         try:
             checkMorePurchases(sb=sb)
