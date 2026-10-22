@@ -153,17 +153,3 @@ def loadOwned() -> list[UdemyCourseOwn]:
     with open(data_path, "rb") as load_file:
         data_load = pickle.load(load_file)
         return(data_load)
-
-def uniqueCourses(courses: list[UdemyCourseOwn]):
-    '''
-    x
-    '''
-    unique_courses = {}
-    ind = 0
-    while ind < len(courses):
-        c_link = courses[ind].course_link
-        if(c_link not in unique_courses):
-            unique_courses[c_link] = None
-            ind = ind + 1
-        else:
-            del courses[ind]

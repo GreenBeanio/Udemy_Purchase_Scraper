@@ -72,6 +72,20 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
             break
     return(courses)
 
+def getUniqueCourses(courses: list[UdemyCourseOwn]):
+    '''
+    x
+    '''
+    unique_courses = {}
+    ind = 0
+    while ind < len(courses):
+        c_link = courses[ind].course_link
+        if(c_link not in unique_courses):
+            unique_courses[c_link] = None
+            ind = ind + 1
+        else:
+            del courses[ind]
+
 def getOwnedCurrentURL(sb: BaseCase, course_link: str) -> str:
     """
     x
