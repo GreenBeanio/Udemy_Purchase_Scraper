@@ -55,8 +55,8 @@ with ThreadPoolExecutor(max_workers=2) as executor:
             current_future = futures_map.pop(future)
             # Should be simple enough logic to not need a state machine or registry type pattern
             if current_future == "owned":
-                url_future = executor.submit(uniqueCourses, future.result())
-                futures_map[url_future] = "unique"
+                unique_future = executor.submit(uniqueCourses, future.result())
+                futures_map[unique_future] = "unique"
             elif current_future == "unique":
                 url_future = executor.submit(getOwnedCurrentURLs, future.result())
                 futures_map[url_future] = "url"

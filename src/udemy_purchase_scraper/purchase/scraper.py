@@ -38,8 +38,8 @@ def getPurchaseInformation(purchase: Element, sb: SB) -> UdemyPurchase:
             break
     purchase_date: datetime.date = datetime.datetime.strptime(purchase_date, "%b %d, %Y").date()
     cur_purchase = UdemyPurchase(purchase_number=purchase_number,
-                                        purchase_cost= purchase_cost,
-                                        purchase_date=purchase_date)
+                                 purchase_cost= purchase_cost,
+                                 purchase_date=purchase_date)
     return(cur_purchase)
 
 def checkMultipleCourses(purchase: Element) -> Element:
@@ -59,12 +59,12 @@ def getPurchaseCourseSingle(purchase: Element) -> UdemyCoursePurchase:
     course_name_element: Element = purchase.query_selector("div[class*='paginated-table_purchase-details--content-title-text']")
     course_name_element: Element = course_name_element.query_selector("a")
     course_name: str = course_name_element.get_html()
-    course_link: str = course_name_element.href
+    course_link: str = f"https://www.udemy.com{course_name_element.href}"
     course_price: str = purchase.query_selector("div[class*='app_positive-text']").text
     course_price: Decimal = Decimal(course_price.replace("$","").strip())
     course = UdemyCoursePurchase(course_name=course_name,
-                                        course_link=course_link,
-                                        course_cost=course_price)
+                                 course_link=course_link,
+                                 course_cost=course_price)
     return(course)
 
 def getPurchaseCourseMultiple(sb: BaseCase) -> list[Element]:

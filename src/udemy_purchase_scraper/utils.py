@@ -154,7 +154,7 @@ def loadOwned() -> list[UdemyCourseOwn]:
         data_load = pickle.load(load_file)
         return(data_load)
 
-def uniqueCourses(courses: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
+def uniqueCourses(courses: list[UdemyCourseOwn]):
     '''
     x
     '''
@@ -167,4 +167,3 @@ def uniqueCourses(courses: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
             ind = ind + 1
         else:
             del courses[ind]
-    return(courses)
