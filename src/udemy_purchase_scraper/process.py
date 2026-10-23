@@ -25,8 +25,11 @@ def findFreeCourses(owned_dict, purchase_dict):
 
 def recalculatePurchases(purchases, owned_dict):
     original_lengths = [len(purchase.courses) for purchase in purchases]
+    purchase_dict = {}
     for purchase in purchases:
-        purchase.courses = [course for course in purchase.courses if course.course_link in owned_dict]
+        purchase.courses = [course for course in purchase.courses if course.course_link in owned_dict and course.course_link not in purchase_dict]
+        for course in purchase.courses:
+            purchase_dict[course.course_link] = None
     new_lengths = [len(purchase.courses) for purchase in purchases]
     for ind, purchase in enumerate(purchases):
         if original_lengths[ind] != new_lengths[ind] and new_lengths[ind] != 0:
