@@ -20,3 +20,13 @@ class UdemyPurchase:
     purchase_date: datetime.date
     purchase_cost: Decimal
     courses: any|None = None
+
+    def toExcelDict(self):
+        """
+        x
+        """
+        return({
+            "purchase_number": self.purchase_number,
+            "purchase_date": self.purchase_date,
+            "purchase_cost": self.purchase_cost
+        })

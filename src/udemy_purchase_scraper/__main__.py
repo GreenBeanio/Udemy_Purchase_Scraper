@@ -4,7 +4,7 @@ from udemy_purchase_scraper.utils import saveOwned, savePurchases
 from udemy_purchase_scraper.login import checkLogin
 from udemy_purchase_scraper.owned.tasks import taskOwned
 from udemy_purchase_scraper.purchase.tasks import taskPurchases
-from udemy_purchase_scraper.process import processItems
+from udemy_purchase_scraper.process import processItems, exportAllExcel
 from concurrent.futures import ThreadPoolExecutor, wait, as_completed, FIRST_COMPLETED
 import sys
 #endregion
@@ -66,8 +66,9 @@ def main():
         purchases = purchases.result()
         owned = owned.result()
     processItems(owned, purchases)
-    savePurchases(purchases)
-    saveOwned(owned)
+    #savePurchases(purchases)
+    #saveOwned(owned)
+    exportAllExcel(owned, purchases)
 
 if __name__ == "__main__":
     main()

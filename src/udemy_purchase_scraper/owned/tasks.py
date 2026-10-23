@@ -16,4 +16,4 @@ def taskOwned() -> None:
         owned_result = getOwnedPages(sb=sb)
         getUniqueCourses(owned_result)
         getOwnedCurrentURLs(owned_result)
-        return(owned_result)
+        return owned_result 

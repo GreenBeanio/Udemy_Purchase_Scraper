@@ -14,4 +14,4 @@ def taskPurchases() -> None:
         loadCookies(sb=sb)
         time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
         purchase_result = getPurchasePages(sb=sb)
-        return(purchase_result)
+        return purchase_result 

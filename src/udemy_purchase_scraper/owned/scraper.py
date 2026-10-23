@@ -20,7 +20,7 @@ def getOwnedInformation(course: Element) -> UdemyCourseOwn:
     cur_purchase = UdemyCourseOwn(course_name=course_title,
                                          course_link=course_link,
                                          course_author=instructor)
-    return(cur_purchase)
+    return cur_purchase 
 
 def getOwnedPage(sb: BaseCase) -> list[UdemyCourseOwn]:
     '''
@@ -29,7 +29,7 @@ def getOwnedPage(sb: BaseCase) -> list[UdemyCourseOwn]:
     courses_grid: Element = sb.find_element("div[class='my-courses__course-card-grid']")
     courses: list[Element] = courses_grid.query_selector_all(":scope > div")
     courses = [getOwnedInformation(course=course) for course in courses]
-    return(courses)
+    return courses 
 
 def checkMoreOwned(sb: BaseCase) -> Element:
     '''
@@ -50,7 +50,7 @@ def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
     while retry < int(os.environ.get("RETRY_LIMIT", 3)):
         try:
             page_results = getOwnedPage(sb=sb)
-            return(page_results)
+            return page_results 
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
@@ -70,7 +70,7 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
             checkMoreOwned(sb=sb)
         except LastPageError:
             break
-    return(courses)
+    return courses 
 
 def getUniqueCourses(courses: list[UdemyCourseOwn]):
     '''
@@ -80,7 +80,7 @@ def getUniqueCourses(courses: list[UdemyCourseOwn]):
     ind = 0
     while ind < len(courses):
         c_link = courses[ind].course_link
-        if(c_link not in unique_courses):
+        if c_link not in unique_courses:
             unique_courses[c_link] = None
             ind = ind + 1
         else:
@@ -91,7 +91,7 @@ def getOwnedCurrentURL(sb: BaseCase, course_link: str) -> str:
     x
     """
     sb.goto(course_link)
-    return(sb.current_url.split("/learn")[0])
+    return sb.current_url.split("/learn")[0] 
 
 def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> str:
     """
@@ -102,7 +102,7 @@ def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> st
         try:
             response = session.head(course_link, allow_redirects=True)
             response.raise_for_status()
-            return(response.url.split("/learn/")[0])
+            return response.url.split("/learn/")[0] 
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))

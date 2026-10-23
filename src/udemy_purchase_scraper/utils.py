@@ -22,7 +22,7 @@ def checkForceNewCookies() -> bool:
             force_new_cookies = True
         else:
             force_new_cookies = False
-    return(force_new_cookies)
+    return force_new_cookies 
 
 def checkHeadless() -> bool:
     """
@@ -31,7 +31,7 @@ def checkHeadless() -> bool:
     run_headless = os.environ.get("HEADLESS", False)
     if isinstance(run_headless, str):
         run_headless = run_headless.lower() == "true"
-    return(run_headless)
+    return run_headless 
 
 def checkUseHeadless() -> bool:
     """
@@ -40,7 +40,7 @@ def checkUseHeadless() -> bool:
     run_headless = checkHeadless()
     force_new_cookies = checkForceNewCookies()
     headless_status = not force_new_cookies and run_headless
-    return(headless_status)
+    return headless_status 
 
 def checkChromeVersion() -> int|None:
     """
@@ -55,7 +55,7 @@ def checkChromeVersion() -> int|None:
                 chrome_version = int(chrome_version)
             except:
                 chrome_version = None
-    return(chrome_version)
+    return chrome_version 
 
 def saveCookies(sb: BaseCase) -> None:
     '''
@@ -113,7 +113,7 @@ def requestsCookiesFromSelenium() -> requests.cookies.RequestsCookieJar:
                     rest = rest  
                 )
             )
-    return(jar)
+    return jar 
 
 def savePurchases(purchase_data: list[UdemyPurchase]) -> None:
     '''
@@ -140,7 +140,7 @@ def loadPurchases() -> list[UdemyPurchase]:
         raise FileNotFoundError("Purchases file does not exist")
     with open(data_path, "rb") as load_file:
         data_load = pickle.load(load_file)
-        return(data_load)
+        return data_load 
 
 def loadOwned() -> list[UdemyCourseOwn]:
     '''
@@ -152,4 +152,4 @@ def loadOwned() -> list[UdemyCourseOwn]:
 
     with open(data_path, "rb") as load_file:
         data_load = pickle.load(load_file)
-        return(data_load)
+        return data_load 

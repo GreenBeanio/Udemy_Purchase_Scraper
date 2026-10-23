@@ -8,6 +8,7 @@ refunded_courses.txt
 courses_to_purchase.txt
 *.pkl
 downloaded_files/
+*.xlsx
 
 # Github Tempalte
 

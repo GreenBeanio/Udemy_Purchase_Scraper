@@ -14,7 +14,7 @@ def getPurchasePage(sb: BaseCase) -> list[Element]:
     '''
     purchase_table: Element = sb.find_element("table[class*='paginated-table_purchase-history-table']")
     purchases: list[Element] = purchase_table.query_selector_all("tr[class*='paginated-table_purchase-history-table--main-row']")
-    return(purchases)
+    return purchases 
 
 def getPurchaseInformation(purchase: Element, sb: SB) -> UdemyPurchase:
     '''
@@ -40,7 +40,7 @@ def getPurchaseInformation(purchase: Element, sb: SB) -> UdemyPurchase:
     cur_purchase = UdemyPurchase(purchase_number=purchase_number,
                                  purchase_cost= purchase_cost,
                                  purchase_date=purchase_date)
-    return(cur_purchase)
+    return cur_purchase 
 
 def checkMultipleCourses(purchase: Element) -> Element:
     '''
@@ -50,7 +50,7 @@ def checkMultipleCourses(purchase: Element) -> Element:
     show_more_button: Element = link_section.query_selector("button[class*='show-more_focusable-label']")
     if show_more_button is None:
         raise SingleCourseError("Purchase only has a single course")
-    return(show_more_button)
+    return show_more_button 
 
 def getPurchaseCourseSingle(purchase: Element) -> UdemyCoursePurchase:
     '''
@@ -65,7 +65,7 @@ def getPurchaseCourseSingle(purchase: Element) -> UdemyCoursePurchase:
     course = UdemyCoursePurchase(course_name=course_name,
                                  course_link=course_link,
                                  course_cost=course_price)
-    return(course)
+    return course 
 
 def getPurchaseCourseMultiple(sb: BaseCase) -> list[Element]:
     '''
@@ -73,7 +73,7 @@ def getPurchaseCourseMultiple(sb: BaseCase) -> list[Element]:
     '''
     courses: list[Element] = sb.find_elements("tr[class*='paginated-table_purchase-history-table--sub-row']")
     courses = [getPurchaseCourseSingle(purchase=course) for course in courses]
-    return(courses)
+    return courses 
 
 def getPurchaseCourses(purchase: any, sb: BaseCase) -> list[UdemyCoursePurchase]:
     '''
@@ -88,7 +88,7 @@ def getPurchaseCourses(purchase: any, sb: BaseCase) -> list[UdemyCoursePurchase]
         time.sleep(int(os.environ.get("SLEEP_TIME", 3))/2)
     except SingleCourseError:
         courses = [getPurchaseCourseSingle(purchase)]
-    return(courses)
+    return courses 
 
 def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
     """
@@ -103,7 +103,7 @@ def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
                 cur_purchase = getPurchaseInformation(purchase=purchase, sb=sb)
                 cur_purchase.courses = getPurchaseCourses(purchase=purchase, sb=sb)
                 purchases[ind] = cur_purchase
-            return(purchases)
+            return purchases 
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
@@ -135,4 +135,4 @@ def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
             checkMorePurchases(sb=sb)
         except LastPageError:
             break
-    return(purchases)
+    return purchases 
