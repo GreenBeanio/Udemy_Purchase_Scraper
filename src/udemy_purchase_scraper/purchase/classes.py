@@ -28,5 +28,6 @@ class UdemyPurchase:
         return({
             "purchase_number": self.purchase_number,
             "purchase_date": self.purchase_date,
-            "purchase_cost": self.purchase_cost
+            "purchase_cost": self.purchase_cost,
+            "course_count": len(self.courses)
         })

@@ -26,7 +26,7 @@ class UdemyCourseOwn:
         return({
             "course_name": self.course_name,
             "course_author": self.course_author,
-            "cost": self.purchase.course_cost if self.purchase is not None else None,
-            "purchase_date": self.purchase.course_date if self.purchase is not None else None,
-            "purchase_number": self.purchase.course_purchase if self.purchase is not None else None
+            "cost": self.purchase.course_cost if self.purchase is not None else Decimal(0),
+            "purchase_date": self.purchase.course_date if self.purchase is not None else None, # No good way to have this be something other than None for the Excel output
+            "purchase_number": self.purchase.course_purchase if self.purchase is not None else "Free"
         })

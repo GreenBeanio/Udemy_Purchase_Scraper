@@ -135,4 +135,5 @@ def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
             checkMorePurchases(sb=sb)
         except LastPageError:
             break
-    return purchases.reverse()
+    purchases.reverse()
+    return purchases

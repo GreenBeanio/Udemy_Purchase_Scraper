@@ -70,7 +70,8 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
             checkMoreOwned(sb=sb)
         except LastPageError:
             break
-    return courses.reverse()
+    courses.reverse()
+    return courses
 
 def getUniqueCourses(courses: list[UdemyCourseOwn]):
     '''
