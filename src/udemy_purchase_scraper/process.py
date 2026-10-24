@@ -1,10 +1,8 @@
+from udemy_purchase_scraper.config import CONFIG
 from udemy_purchase_scraper.owned.classes import UdemyCoursePurchaseDetails, UdemyCourseOwn
 from udemy_purchase_scraper.purchase.classes import UdemyPurchase
 from udemy_purchase_scraper.protocols import ExcelOutputable
 import pandas as pd
-import os
-from pathlib import Path
-from typing import Literal
 import logging
 
 logger = logging.getLogger(__name__)
@@ -87,7 +85,7 @@ def exportAllExcel(owned: list[UdemyCourseOwn], purchases: list[UdemyPurchase]):
     Exports Udemy classes into an Excel file
     """
     logger.info("Exporting to Excel")
-    output_path = Path(os.environ.get("OUTPUT_PATH", "Udemy.xlsx"))
+    output_path = CONFIG.OUTPUT_PATH
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
         toDF(purchases).to_excel(writer,
                                  sheet_name="Purchase", 

@@ -16,7 +16,7 @@ def taskOwned() -> list[UdemyCourseOwn]:
     with manager as sb:
         sb.goto("https://www.udemy.com/")
         loadCookies(sb=sb)
-        time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+        time.sleep(CONFIG.SLEEP_TIME)
         owned_result = getOwnedPages(sb=sb)
         getOwnedCurrentURLs(owned_result)
         logging.info("Finished Scraping Owned")

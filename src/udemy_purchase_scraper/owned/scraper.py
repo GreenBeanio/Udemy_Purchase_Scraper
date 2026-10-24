@@ -41,7 +41,7 @@ def checkMoreOwned(sb: BaseCase) -> Element:
     try:
         next_page: Element = sb.find_element("a[class*=pagination-module--next][aria-label='next page'][aria-disabled='false']")
         next_page.click()
-        time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+        time.sleep(CONFIG.SLEEP_TIME)
     except:
         raise LastPageError("No more owned pages")
 
@@ -50,13 +50,13 @@ def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
     Handles retries while scraping a single owned courses page
     """
     retry = 0
-    while retry < int(os.environ.get("RETRY_LIMIT", 3)):
+    while retry < CONFIG.RETRY_LIMIT:
         try:
             page_results = getOwnedPage(sb=sb)
             return page_results 
         except:
             retry += 1
-            time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+            time.sleep(CONFIG.SLEEP_TIME)
     logger.critical("Ran out of scrape attempts in getOwnedResults")
     raise RetryError("Ran out of retries")
 
@@ -67,7 +67,7 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
     Note that this does not currently scrape the archived courses option (as I have none, but it would easily be added)
     """
     sb.goto("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
-    time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+    time.sleep(CONFIG.SLEEP_TIME)
     courses_dict = {}
     courses = []
     count = 0
@@ -93,14 +93,14 @@ def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> st
     Scrapes a owned course to get the url of its page listing
     """
     retry = 0
-    while retry < int(os.environ.get("RETRY_LIMIT", 3)):
+    while retry < CONFIG.RETRY_LIMIT:
         try:
             response = session.head(course_link, allow_redirects=True)
             response.raise_for_status()
             return response.url.split("/learn/")[0] 
         except:
             retry += 1
-            time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+            time.sleep(CONFIG.SLEEP_TIME)
     logger.critical("Ran out of scrape attempts in getOwnedCurrentURLRequest")
     raise RetryError("Ran out of retries")
 

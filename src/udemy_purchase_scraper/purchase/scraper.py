@@ -1,9 +1,9 @@
+from udemy_purchase_scraper.config import CONFIG
 from seleniumbase import BaseCase
 from seleniumbase import SB
 from seleniumbase.undetected.cdp_driver.element import Element
 import datetime
 from decimal import Decimal
-import os
 import time
 from udemy_purchase_scraper.exceptions import SingleCourseError, RetryError, LastPageError
 from udemy_purchase_scraper.purchase.classes import UdemyPurchase, UdemyCoursePurchase
@@ -85,10 +85,10 @@ def getPurchaseCourses(purchase: Element, sb: BaseCase) -> list[UdemyCoursePurch
     try:
         expand_purchase = checkMultipleCourses(purchase)
         expand_purchase.click()
-        time.sleep(int(os.environ.get("SLEEP_TIME", 3))/2)
+        time.sleep(int(CONFIG.SLEEP_TIME)/2)
         courses = getPurchaseCourseMultiple(sb=sb)
         expand_purchase.click()
-        time.sleep(int(os.environ.get("SLEEP_TIME", 3))/2)
+        time.sleep(int(CONFIG.SLEEP_TIME)/2)
     except SingleCourseError:
         courses = [getPurchaseCourseSingle(purchase)]
     return courses 
@@ -98,7 +98,7 @@ def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
     Handles retries while scraping a single purchases page
     """
     retry = 0
-    while retry < int(os.environ.get("RETRY_LIMIT", 3)):
+    while retry < CONFIG.RETRY_LIMIT:
         try:
             purchase_page = getPurchasePage(sb=sb)
             purchases = [None] * len(purchase_page)
@@ -109,7 +109,7 @@ def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
             return purchases 
         except:
             retry += 1
-            time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+            time.sleep(CONFIG.SLEEP_TIME)
     logger.critical("Ran out of scrape attempts in getPurchasePageResults")
     raise RetryError("Ran out of retries")
 
@@ -120,7 +120,7 @@ def checkMorePurchases(sb: BaseCase) -> None:
     try:
         next_page: Element = sb.find_element("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
         next_page.click()
-        time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+        time.sleep(CONFIG.SLEEP_TIME)
     except:
         raise LastPageError("No more purchase pages")
 
@@ -130,7 +130,7 @@ def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
     Scrapes purchase pages
     """
     sb.goto("https://www.udemy.com/dashboard/purchase-history/")
-    time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+    time.sleep(CONFIG.SLEEP_TIME)
     purchases: list[UdemyPurchase] = []
     count = 0
     logger.info("Starting Purchase Pages")
