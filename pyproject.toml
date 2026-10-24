@@ -11,6 +11,7 @@ requires-python = ">=3.15"
 dependencies = [
     "openpyxl>=3.1.5",
     "pandas>=3.1.0",
+    "python-dotenv>=1.2.4",
     "requests>=2.34.2",
     "seleniumbase>=4.55.2",
 ]
@@ -18,9 +19,3 @@ dependencies = [
 [build-system]
 requires = ["uv-build"]
 build-backend = "uv_build"
-
-[dependency-groups]
-dev = [
-    "ipykernel",
-    "python-dotenv",
-]
