@@ -18,25 +18,6 @@ def getOwnedDict(owned: any):
         owned_dict[course.course_page] = course
     return owned_dict 
 
-def getPurchaseDict(purchases: any):
-    """
-    x
-    Needs purchases in oldest to newest such as from getPurchasePages
-    """
-    purchase_dict = {}
-    for purchase in purchases:
-        for course in purchase.courses:
-            purchase_dict[course.course_link] = None
-    return purchase_dict 
-
-def findFreeCourses(owned_dict, purchase_dict):
-    """
-    x
-    """
-    missing_owned_courses = set(owned_dict.keys()).difference(set(purchase_dict.keys()))
-    free_courses = [owned_dict[course] for course in missing_owned_courses]
-    return free_courses 
-
 def recalculatePurchases(purchases, owned_dict):
     """
     x
@@ -76,25 +57,14 @@ def mergeOwned(owned, course_purchase_details):
         if course.course_page in course_purchase_details:
             owned[crs_ind].purchase = course_purchase_details[course.course_page]
 
-def mergePurchases(purchases, course_purchase_details):
-    """
-    x
-    """
-    for p_ind, purchase in enumerate(purchases):
-        for c_ind, course in enumerate(purchase.courses):
-            purchases[p_ind].courses[c_ind] = course_purchase_details[course.course_link]
-
 def processItems(owned, purchases):
     """
     x
     """
     owned_dict = getOwnedDict(owned)
-    #purchase_dict = getPurchaseDict(purchases)
-    #free_dict = findFreeCourses(owned_dict, purchase_dict)
-    recalculatePurchases(purchases, owned_dict)
+    purchases = recalculatePurchases(purchases, owned_dict)
     course_purchase_details = getCoursePurchaseDetails(purchases)
     mergeOwned(owned, course_purchase_details)
-    #mergePurchases(purchases, course_purchase_details)
     logger.info("Items Processed")
 
 def toDF(source_list: ExcelOutputable) -> pd.DataFrame:
@@ -103,22 +73,12 @@ def toDF(source_list: ExcelOutputable) -> pd.DataFrame:
     """
     return pd.DataFrame([item.toExcelDict() for item in source_list])
 
-def exportExcel(df: pd.DataFrame, sheet_name = Literal["Purchase", "Course"]):
-    """
-    x
-    """
-    output_path = Path(os.environ.get("OUTPUT_PATH", "Udemy.xlsx"))
-    df.to_excel(output_path, 
-                sheet_name=sheet_name, 
-                index=False, 
-                engine="openpyxl")
-
 def exportAllExcel(owned, purchases):
     """
     x
     """
     output_path = Path(os.environ.get("OUTPUT_PATH", "Udemy.xlsx"))
-    with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+    with pd.ExcelWrixter(output_path, engine="openpyxl") as writer:
         toDF(purchases).to_excel(writer,
                                  sheet_name="Purchase", 
                                  index=False)

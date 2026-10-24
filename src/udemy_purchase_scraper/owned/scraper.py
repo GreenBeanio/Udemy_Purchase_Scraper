@@ -60,7 +60,7 @@ def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
     logger.critical("Ran out of scrape attempts in getOwnedResults")
     raise RetryError("Ran out of retries")
 
-def getOwnedPages(sb: BaseCase, session: requests.Session) -> list[UdemyCourseOwn]:
+def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
     """
     
     """
@@ -84,27 +84,6 @@ def getOwnedPages(sb: BaseCase, session: requests.Session) -> list[UdemyCourseOw
     courses.reverse() # Need to reverse to be oldest to newest
     logger.info("Finished Owned Pages")
     return courses
-
-def getUniqueCourses(courses: list[UdemyCourseOwn]):
-    '''
-    x
-    '''
-    unique_courses = {}
-    ind = 0
-    while ind < len(courses):
-        c_link = courses[ind].course_link
-        if c_link not in unique_courses:
-            unique_courses[c_link] = None
-            ind = ind + 1
-        else:
-            del courses[ind]
-
-def getOwnedCurrentURL(sb: BaseCase, course_link: str) -> str:
-    """
-    x
-    """
-    sb.goto(course_link)
-    return sb.current_url.split("/learn")[0] 
 
 def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> str:
     """

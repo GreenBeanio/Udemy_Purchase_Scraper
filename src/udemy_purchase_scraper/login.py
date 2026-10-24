@@ -15,8 +15,6 @@ def watchLogin(sb: BaseCase) -> None:
     x
     """
     sb.maximize()
-    # sb.execute_script("alert('Login to Udemy to continue');")
-    # sb.evaluate("alert('Login to Udemy to continue');")
     sb.set_messenger_theme(theme="flat", location="top_center")
     sb.post_message("Login to Udemy to continue")
     while True:
