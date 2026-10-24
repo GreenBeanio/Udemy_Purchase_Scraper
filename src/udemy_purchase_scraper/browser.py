@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from collections.abc import Generator
 
 @contextmanager
-def startBrowser(is_headless = None) -> Generator[SB, None, None]:
+def startBrowser(is_headless: bool = None, driver_list: list = None) -> Generator[SB, None, None]:
     """
     Starts a Selenium browser instance
     """
@@ -20,7 +20,13 @@ def startBrowser(is_headless = None) -> Generator[SB, None, None]:
                 driver_version=CONFIG.CHROME_VERSION, # A version to pin if needed
                 window_size="1920, 1080"
             ) as sb:
-                yield(sb)
+                if driver_list is not None:
+                      driver_list.append(sb.driver)
+                try:
+                    yield(sb)
+                finally:
+                      if driver_list is not None and sb.driver in driver_list:
+                            driver_list.remove(sb.driver)
     else:
         with SB(
                 incognito=True, # Hides past session/profile info
@@ -28,4 +34,10 @@ def startBrowser(is_headless = None) -> Generator[SB, None, None]:
                 driver_version=CONFIG.CHROME_VERSION, # A version to pin if needed
                 window_position="0, 0"
             ) as sb:
-                yield(sb)
+                if driver_list is not None:
+                    driver_list.append(sb.driver)
+                try:
+                    yield(sb)
+                finally:
+                        if driver_list is not None and sb.driver in driver_list:
+                            driver_list.remove(sb.driver)

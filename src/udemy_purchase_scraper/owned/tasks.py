@@ -9,11 +9,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def taskOwned() -> list[UdemyCourseOwn]:
+def taskOwned(is_headless: bool = None, driver_list: list = None) -> list[UdemyCourseOwn]:
     """
     Multithreading task to scrape owned Udemy courses
     """
-    manager = browser.startBrowser()
+    manager = browser.startBrowser(is_headless=is_headless, driver_list=driver_list)
     with manager as sb:
         sb.goto("https://www.udemy.com/")
         loadCookies(sb=sb)

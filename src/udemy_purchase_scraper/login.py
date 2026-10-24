@@ -25,11 +25,11 @@ def checkLogin(sb: BaseCase) -> None:
             break
     saveCookies(sb=sb)
              
-def attemptLogin(is_headless: bool) -> None:
+def attemptLogin(is_headless: bool, driver_list: list = None) -> None:
     """
     Attempts logging into Udemy
     """
-    manager = startBrowser(is_headless)
+    manager = startBrowser(is_headless=is_headless, driver_list=driver_list)
     with manager as sb:
         sb.minimize()
         sb.goto("https://www.udemy.com/")
@@ -53,7 +53,7 @@ def attemptLogin(is_headless: bool) -> None:
             CONFIG.COOKIES_PATH.unlink()
             raise BadCookies("Login was unsuccessful")
 
-def handleLogin() -> None:
+def handleLogin(driver_list: list = None) -> None:
     """
     Handles logging into Udemy
     """

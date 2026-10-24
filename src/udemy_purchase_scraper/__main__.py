@@ -36,15 +36,26 @@ def main():
                             ])
     CONFIG.load(args.env)
     sys.argv.append("-n") # Make Selenium be multi-threaded
-    handleLogin()
-    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="Scraper") as executor:
-        purchases = executor.submit(taskPurchases)
-        owned = executor.submit(taskOwned)
-        wait([purchases, owned])
-        purchases = purchases.result()
-        owned = owned.result()
-    processItems(owned, purchases)
-    exportAllExcel(owned, purchases)
+    driver_list = []
+    try:
+        handleLogin(driver_list=driver_list)
+        with ThreadPoolExecutor(max_workers=2, thread_name_prefix="Scraper") as executor:
+            purchases = executor.submit(taskPurchases, driver_list=driver_list)
+            owned = executor.submit(taskOwned, driver_list=driver_list)
+            wait([purchases, owned])
+            purchases = purchases.result()
+            owned = owned.result()
+        processItems(owned, purchases)
+        exportAllExcel(owned, purchases)
+    except KeyboardInterrupt:
+        logging.critical("Cancelled form Keyboard Interrupt")
+    finally:
+        for driver in driver_list:
+            try:
+                driver.quit()
+                logging.info("Selenium driver closed")
+            except:
+                logging.critical("Selenium driver failed to quit")
 
 if __name__ == "__main__":
     main()
