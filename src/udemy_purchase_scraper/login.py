@@ -62,6 +62,7 @@ def handleLogin() -> None:
     """
     cur_headless = checkUseHeadless()
     retry = 0
+    logger.info("Attempting to login")
     while retry < int(CONFIG.SLEEP_TIME):
         try:
             attemptLogin(cur_headless)
@@ -73,6 +74,6 @@ def handleLogin() -> None:
             logger.info("Activating Headed mode for manual login")
         except:
             retry = retry + 1
-            logger.warning("Unsuccessful Login")
+            logger.warning("Unsuccessful login")
     logger.critical("Ran out of login attempts")
     raise RetryError("Ran out of retries")

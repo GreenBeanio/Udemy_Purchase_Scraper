@@ -5,10 +5,12 @@ from contextlib import contextmanager
 from collections.abc import Generator
 
 @contextmanager
-def startBrowser(is_headless = checkUseHeadless()) -> Generator[SB, None, None]:
+def startBrowser(is_headless = None) -> Generator[SB, None, None]:
     """
     Starts a Selenium browser instance
     """
+    if is_headless is None:
+          is_headless = checkUseHeadless()
     if is_headless:
         with SB(
                 incognito=True, # Hides past session/profile info
