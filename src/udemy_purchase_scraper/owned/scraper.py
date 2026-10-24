@@ -60,17 +60,21 @@ def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
     logger.critical("Ran out of scrape attempts in getOwnedResults")
     raise RetryError("Ran out of retries")
 
-def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
+def getOwnedPages(sb: BaseCase, session: requests.Session) -> list[UdemyCourseOwn]:
     """
     
     """
     sb.goto("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+    courses_dict = {}
     courses = []
     count = 0
     while True:
         count = count + 1
         page_results = getOwnedResults(sb=sb)
+        page_results = [course for course in page_results if course.course_link not in courses_dict]
+        for course in page_results:
+            courses_dict[course.course_link] = None
         courses.extend(page_results)
         logger.info(f"Finished Owned Page: {count}")
         try:

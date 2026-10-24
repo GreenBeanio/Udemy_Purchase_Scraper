@@ -17,7 +17,7 @@ def taskOwned() -> None:
         loadCookies(sb=sb)
         time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
         owned_result = getOwnedPages(sb=sb)
-        getUniqueCourses(owned_result)
+        #getUniqueCourses(owned_result)
         getOwnedCurrentURLs(owned_result)
         logging.info("Finished Scraping Owned")
         return owned_result 
