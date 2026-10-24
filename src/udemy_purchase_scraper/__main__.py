@@ -4,11 +4,13 @@ from udemy_purchase_scraper.owned.tasks import taskOwned
 from udemy_purchase_scraper.purchase.tasks import taskPurchases
 from udemy_purchase_scraper.process import processItems, exportAllExcel
 from udemy_purchase_scraper.utils import checkLogLevel
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, wait
+import threading
 import sys
 import logging
 import argparse
-from pathlib import Path
+import signal
 
 def main():
     """
@@ -37,25 +39,53 @@ def main():
     CONFIG.load(args.env)
     sys.argv.append("-n") # Make Selenium be multi-threaded
     driver_list = []
+
+    def makeDaemon(*args, **kwargs):
+        """
+        Makes a thread a daemon thread
+        """
+        thread = threading.Thread(*args, **kwargs)
+        thread.daemon = True
+        return thread
+
+    executor = ThreadPoolExecutor(
+        max_workers=2, 
+        thread_name_prefix="Scraper")
+    executor._thread_factory = makeDaemon
+
+    def handleShutdown(signum, frame):
+        """
+        Shuts down in the event of a keyboard interrupt
+        """
+        logging.critical("Cancelled form Keyboard Interrupt")
+        executor.shutdown(wait=False, cancel_futures=True)
+        logging.info("Thread Pool closed")
+        if driver_list:
+            for driver in driver_list:
+                try:
+                    driver.quit()
+                    logging.info("Selenium driver closed")
+                except:
+                    logging.critical("Selenium driver failed to quit")
+        sys.exit(130)
+
+    signal.signal(signal.SIGINT, handleShutdown)
+
     try:
         handleLogin(driver_list=driver_list)
-        with ThreadPoolExecutor(max_workers=2, thread_name_prefix="Scraper") as executor:
-            purchases = executor.submit(taskPurchases, driver_list=driver_list)
-            owned = executor.submit(taskOwned, driver_list=driver_list)
-            wait([purchases, owned])
-            purchases = purchases.result()
-            owned = owned.result()
+        purchases = executor.submit(taskPurchases, driver_list=driver_list)
+        owned = executor.submit(taskOwned, driver_list=driver_list)
+        wait([purchases, owned])
+        purchases = purchases.result()
+        owned = owned.result()
         processItems(owned, purchases)
         exportAllExcel(owned, purchases)
-    except KeyboardInterrupt:
-        logging.critical("Cancelled form Keyboard Interrupt")
+    except:
+        logging.critical("Exception in main")
     finally:
-        for driver in driver_list:
-            try:
-                driver.quit()
-                logging.info("Selenium driver closed")
-            except:
-                logging.critical("Selenium driver failed to quit")
-
+        executor.shutdown()
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        logging.info("Shutting Down")
+        
 if __name__ == "__main__":
     main()
