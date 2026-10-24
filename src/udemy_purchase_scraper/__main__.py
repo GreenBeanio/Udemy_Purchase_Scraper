@@ -29,8 +29,6 @@ def main():
         wait([purchases, owned])
         purchases = purchases.result()
         owned = owned.result()
-    savePurchases(purchases)
-    saveOwned(owned)
     processItems(owned, purchases)
     exportAllExcel(owned, purchases)
 

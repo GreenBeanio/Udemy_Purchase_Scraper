@@ -32,9 +32,13 @@ def recalculatePurchases(purchases, owned_dict):
             purchase_dict[course.course_link] = None
         if len(purchase.courses) != original_lengths:
             purchases[ind].purchase_cost = sum([course.course_cost for course in purchase.courses])
-    purchases = [purchase for purchase in purchases if len(purchase.courses) != 0]
+    ind = 0
+    while ind < len(purchases):
+        if len(purchases[ind].courses) == 0:
+            del purchases[ind]
+        else:
+            ind = ind + 1
     purchases.reverse() # Return it as oldest to newest to match the input
-    return purchases 
 
 def getCoursePurchaseDetails(purchases):
     """
@@ -62,7 +66,7 @@ def processItems(owned, purchases):
     x
     """
     owned_dict = getOwnedDict(owned)
-    purchases = recalculatePurchases(purchases, owned_dict)
+    recalculatePurchases(purchases, owned_dict)
     course_purchase_details = getCoursePurchaseDetails(purchases)
     mergeOwned(owned, course_purchase_details)
     logger.info("Items Processed")
@@ -78,7 +82,7 @@ def exportAllExcel(owned, purchases):
     x
     """
     output_path = Path(os.environ.get("OUTPUT_PATH", "Udemy.xlsx"))
-    with pd.ExcelWrixter(output_path, engine="openpyxl") as writer:
+    with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
         toDF(purchases).to_excel(writer,
                                  sheet_name="Purchase", 
                                  index=False)
