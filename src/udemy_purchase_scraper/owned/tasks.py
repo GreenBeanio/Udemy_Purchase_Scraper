@@ -3,6 +3,9 @@ from udemy_purchase_scraper.owned.scraper import getOwnedPages, getUniqueCourses
 from udemy_purchase_scraper.utils import loadCookies
 import time
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def taskOwned() -> None:
     """
@@ -16,4 +19,5 @@ def taskOwned() -> None:
         owned_result = getOwnedPages(sb=sb)
         getUniqueCourses(owned_result)
         getOwnedCurrentURLs(owned_result)
+        logging.info("Finished Scraping Owned")
         return owned_result 

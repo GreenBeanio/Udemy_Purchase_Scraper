@@ -4,14 +4,25 @@ import pandas as pd
 import os
 from pathlib import Path
 from typing import Literal
+import logging
+
+logger = logging.getLogger(__name__)
 
 def getOwnedDict(owned: any):
+    """
+    x
+    Needs owned in oldest to newest such as from getOwnedPages
+    """
     owned_dict = {}
     for course in owned:
         owned_dict[course.course_page] = course
     return owned_dict 
 
 def getPurchaseDict(purchases: any):
+    """
+    x
+    Needs purchases in oldest to newest such as from getPurchasePages
+    """
     purchase_dict = {}
     for purchase in purchases:
         for course in purchase.courses:
@@ -19,25 +30,35 @@ def getPurchaseDict(purchases: any):
     return purchase_dict 
 
 def findFreeCourses(owned_dict, purchase_dict):
+    """
+    x
+    """
     missing_owned_courses = set(owned_dict.keys()).difference(set(purchase_dict.keys()))
     free_courses = [owned_dict[course] for course in missing_owned_courses]
     return free_courses 
 
 def recalculatePurchases(purchases, owned_dict):
-    original_lengths = [len(purchase.courses) for purchase in purchases]
+    """
+    x
+    Needs purchases in oldest to newest such as from getPurchasePages
+    """
+    purchases.reverse() # Logic needs to be in newest to oldest
     purchase_dict = {}
-    for purchase in purchases:
+    for ind, purchase in enumerate(purchases):
+        original_lengths = len(purchase.courses)
         purchase.courses = [course for course in purchase.courses if course.course_link in owned_dict and course.course_link not in purchase_dict]
         for course in purchase.courses:
             purchase_dict[course.course_link] = None
-    new_lengths = [len(purchase.courses) for purchase in purchases]
-    for ind, purchase in enumerate(purchases):
-        if original_lengths[ind] != new_lengths[ind] and new_lengths[ind] != 0:
-            purchases[ind].purchase_cost = sum([course.course_cost for course in purchases[ind].courses])
+        if len(purchase.courses) != original_lengths:
+            purchases[ind].purchase_cost = sum([course.course_cost for course in purchase.courses])
     purchases = [purchase for purchase in purchases if len(purchase.courses) != 0]
+    purchases.reverse() # Return it as oldest to newest to match the input
     return purchases 
 
 def getCoursePurchaseDetails(purchases):
+    """
+    x
+    """
     course_details = {}
     for purchase in purchases:
         for course in purchase.courses:
@@ -48,16 +69,25 @@ def getCoursePurchaseDetails(purchases):
     return course_details 
 
 def mergeOwned(owned, course_purchase_details):
+    """
+    x
+    """
     for crs_ind, course in enumerate(owned):
         if course.course_page in course_purchase_details:
             owned[crs_ind].purchase = course_purchase_details[course.course_page]
 
 def mergePurchases(purchases, course_purchase_details):
+    """
+    x
+    """
     for p_ind, purchase in enumerate(purchases):
         for c_ind, course in enumerate(purchase.courses):
             purchases[p_ind].courses[c_ind] = course_purchase_details[course.course_link]
 
 def processItems(owned, purchases):
+    """
+    x
+    """
     owned_dict = getOwnedDict(owned)
     #purchase_dict = getPurchaseDict(purchases)
     #free_dict = findFreeCourses(owned_dict, purchase_dict)
@@ -65,6 +95,7 @@ def processItems(owned, purchases):
     course_purchase_details = getCoursePurchaseDetails(purchases)
     mergeOwned(owned, course_purchase_details)
     #mergePurchases(purchases, course_purchase_details)
+    logger.info("Items Processed")
 
 def toDF(source_list: ExcelOutputable) -> pd.DataFrame:
     """
@@ -94,4 +125,5 @@ def exportAllExcel(owned, purchases):
         toDF(owned).to_excel(writer,
                              sheet_name="Course", 
                              index=False)
+    logger.info("Exported to Excel")
         

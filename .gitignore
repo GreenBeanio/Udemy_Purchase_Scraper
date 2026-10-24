@@ -9,6 +9,7 @@ courses_to_purchase.txt
 *.pkl
 downloaded_files/
 *.xlsx
+*.log
 
 # Github Tempalte
 

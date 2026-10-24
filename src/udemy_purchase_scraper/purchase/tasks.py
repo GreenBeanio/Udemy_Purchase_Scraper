@@ -3,6 +3,9 @@ from udemy_purchase_scraper.purchase.scraper import getPurchasePages
 from udemy_purchase_scraper.utils import loadCookies
 import time
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def taskPurchases() -> None:
     """
@@ -14,4 +17,5 @@ def taskPurchases() -> None:
         loadCookies(sb=sb)
         time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
         purchase_result = getPurchasePages(sb=sb)
+        logging.info("Finished Scraping Purchases")
         return purchase_result 

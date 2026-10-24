@@ -7,11 +7,20 @@ from udemy_purchase_scraper.purchase.tasks import taskPurchases
 from udemy_purchase_scraper.process import processItems, exportAllExcel
 from concurrent.futures import ThreadPoolExecutor, wait, as_completed, FIRST_COMPLETED
 import sys
+from pathlib import Path
+import os
+import logging
 #endregion
 
 def main():
     # Make Selenium be multi-threaded
     sys.argv.append("-n")
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s [%(threadName)s] %(levelname)s: %(message)s",
+                        handlers=[
+                            logging.StreamHandler(),
+                            logging.FileHandler(Path(os.environ.get("LOG_PATH", "udemy.log")))
+                        ])
     load_dotenv()
     checkLogin()
     #region Scrape Data
@@ -59,7 +68,7 @@ def main():
     #
     # savePurchases(final_result["purchases"])
     # saveOwned(final_result["owned"])
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="Scraper") as executor:
         purchases = executor.submit(taskPurchases)
         owned = executor.submit(taskOwned)
         wait([purchases, owned])

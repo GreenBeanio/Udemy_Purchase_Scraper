@@ -7,6 +7,9 @@ import os
 import time
 from udemy_purchase_scraper.exceptions import SingleCourseError, RetryError, LastPageError
 from udemy_purchase_scraper.purchase.classes import UdemyPurchase, UdemyCoursePurchase
+import logging
+
+logger = logging.getLogger(__name__)
 
 def getPurchasePage(sb: BaseCase) -> list[Element]:
     '''
@@ -107,6 +110,7 @@ def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+    logger.critical("Ran out of scrape attempts in getPurchasePageResults")
     raise RetryError("Ran out of retries")
 
 def checkMorePurchases(sb: BaseCase) -> None:
@@ -128,12 +132,16 @@ def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
     sb.goto("https://www.udemy.com/dashboard/purchase-history/")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     purchases: list[UdemyPurchase] = []
+    count = 0
     while True:
+        count = count + 1
         page_results = getPurchasePageResults(sb)
         purchases.extend(page_results)
+        logger.info(f"Finished Purchase Page: {count}")
         try:
             checkMorePurchases(sb=sb)
         except LastPageError:
             break
-    purchases.reverse()
+    purchases.reverse() # Need to reverse to be oldest to newest
+    logger.info("Finished Purchase Pages")
     return purchases

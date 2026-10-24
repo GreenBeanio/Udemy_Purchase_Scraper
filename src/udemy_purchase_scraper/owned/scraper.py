@@ -7,6 +7,9 @@ from udemy_purchase_scraper.exceptions import LastPageError, RetryError
 from udemy_purchase_scraper.owned.classes import UdemyCourseOwn
 import requests
 from udemy_purchase_scraper.utils import requestsCookiesFromSelenium
+import logging
+
+logger = logging.getLogger(__name__)
 
 def getOwnedInformation(course: Element) -> UdemyCourseOwn:
     '''
@@ -54,6 +57,7 @@ def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+    logger.critical("Ran out of scrape attempts in getOwnedResults")
     raise RetryError("Ran out of retries")
 
 def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
@@ -63,14 +67,18 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
     sb.goto("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     courses = []
+    count = 0
     while True:
+        count = count + 1
         page_results = getOwnedResults(sb=sb)
         courses.extend(page_results)
+        logger.info(f"Finished Owned Page: {count}")
         try:
             checkMoreOwned(sb=sb)
         except LastPageError:
             break
-    courses.reverse()
+    courses.reverse() # Need to reverse to be oldest to newest
+    logger.info("Finished Owned Pages")
     return courses
 
 def getUniqueCourses(courses: list[UdemyCourseOwn]):
@@ -107,6 +115,7 @@ def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> st
         except:
             retry += 1
             time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
+    logger.critical("Ran out of scrape attempts in getOwnedCurrentURLRequest")
     raise RetryError("Ran out of retries")
 
 def getOwnedCurrentURLs(owned: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
@@ -118,3 +127,5 @@ def getOwnedCurrentURLs(owned: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
         session.cookies = requests_cookies
         for ind, course in enumerate(owned):
             owned[ind].course_page = f"{getOwnedCurrentURLRequest(session=session, course_link=course.course_link)}/"
+            logger.info(f"Finished Owned URL: {ind+1}")
+    logger.info("Finished Owned URLs")

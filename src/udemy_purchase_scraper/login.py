@@ -6,6 +6,9 @@ from udemy_purchase_scraper.browser import startBrowser
 from udemy_purchase_scraper.utils import checkForceNewCookies, checkUseHeadless, checkHeadless, saveCookies, loadCookies
 from udemy_purchase_scraper.exceptions import NeedHead, RetryError
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 def watchLogin(sb: BaseCase) -> None:
     """
@@ -66,11 +69,15 @@ def checkLogin() -> None:
         try:
             attemptLogin()
             os.environ["HEADLESS"] = "true" if original_headless else "false"
+            logger.info("Logged in successfully")
             return None
         except NeedHead:
             # Don't count this as a failed attempt since they didn't get a chance to log in
             os.environ["HEADLESS"] = "false"
+            logger.info("Activating Headed mode for manual login")
         except:
             retry = retry + 1
+            logger.info("Unsuccessful Login")
     os.environ["HEADLESS"] = "true" if original_headless else "false"
+    logger.critical("Ran out of login attempts")
     raise RetryError("Ran out of retries")
