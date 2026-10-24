@@ -34,6 +34,8 @@ There are the following command line arguments you can run:
 `-lf` or `--log-file`: Path for the log file (Default: `Udemy.log`)
 `-h` or `--help`: Help message
 
+You will be prompted to login to Udemy manually. Then the script will start. No other way to really handle that with MFA.
+
 ## Output
 
 The main output is an Excel file with 2 tabs:
