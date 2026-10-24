@@ -69,6 +69,7 @@ def processItems(owned: list[UdemyCourseOwn], purchases: list[UdemyPurchase]):
     """
     Processes the owned courses and purchases
     """
+    logger.info("Processing Items")
     owned_dict = getOwnedDict(owned)
     processPurchases(purchases, owned_dict)
     course_purchase_details = getCoursePurchaseDetails(purchases)
@@ -85,6 +86,7 @@ def exportAllExcel(owned: list[UdemyCourseOwn], purchases: list[UdemyPurchase]):
     """
     Exports Udemy classes into an Excel file
     """
+    logger.info("Exporting to Excel")
     output_path = Path(os.environ.get("OUTPUT_PATH", "Udemy.xlsx"))
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
         toDF(purchases).to_excel(writer,

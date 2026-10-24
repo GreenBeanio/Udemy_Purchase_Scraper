@@ -71,6 +71,7 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
     courses_dict = {}
     courses = []
     count = 0
+    logger.info("Starting Owned Pages")
     while True:
         count = count + 1
         page_results = getOwnedResults(sb=sb)
@@ -78,7 +79,7 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
         for course in page_results:
             courses_dict[course.course_link] = None
         courses.extend(page_results)
-        logger.info(f"Finished Owned Page: {count}")
+        logger.debug(f"Finished Owned Page: {count}")
         try:
             checkMoreOwned(sb=sb)
         except LastPageError:
@@ -108,9 +109,10 @@ def getOwnedCurrentURLs(owned: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
     Scrapes owned courses to get the url of their page listing
     """
     requests_cookies = requestsCookiesFromSelenium()
+    logger.info("Starting Owned URLs")
     with requests.Session() as session:
         session.cookies = requests_cookies
         for ind, course in enumerate(owned):
             owned[ind].course_page = f"{getOwnedCurrentURLRequest(session=session, course_link=course.course_link)}/"
-            logger.info(f"Finished Owned URL: {ind+1}")
+            logger.debug(f"Finished Owned URL: {ind+1}")
     logger.info("Finished Owned URLs")

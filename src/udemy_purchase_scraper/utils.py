@@ -6,6 +6,7 @@ from seleniumbase import BaseCase
 import time
 from udemy_purchase_scraper.exceptions import BadCookies
 from pathlib import Path
+import logging
 
 def checkForceNewCookies() -> bool:
     """
@@ -99,3 +100,9 @@ def requestsCookiesFromSelenium() -> requests.cookies.RequestsCookieJar:
                 )
             )
     return jar 
+
+def checkLogLevel() -> logging._Level:
+    """
+    Checks for the logging level
+    """
+    return logging.getLevelNamesMapping().get(os.environ.get("LOG_LVL", "INFO").upper(), logging.INFO)

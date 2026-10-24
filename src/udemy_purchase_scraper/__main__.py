@@ -5,6 +5,7 @@ from udemy_purchase_scraper.owned.tasks import taskOwned
 from udemy_purchase_scraper.purchase.tasks import taskPurchases
 from udemy_purchase_scraper.process import processItems, exportAllExcel
 from concurrent.futures import ThreadPoolExecutor, wait
+from udemy_purchase_scraper.utils import checkLogLevel
 import sys
 from pathlib import Path
 import os
@@ -17,7 +18,7 @@ def main():
     """
     # Make Selenium be multi-threaded
     sys.argv.append("-n")
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=checkLogLevel(),
                         format="%(asctime)s [%(threadName)s] %(levelname)s: %(message)s",
                         handlers=[
                             logging.StreamHandler(),

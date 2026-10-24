@@ -133,11 +133,12 @@ def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
     purchases: list[UdemyPurchase] = []
     count = 0
+    logger.info("Starting Purchase Pages")
     while True:
         count = count + 1
         page_results = getPurchasePageResults(sb)
         purchases.extend(page_results)
-        logger.info(f"Finished Purchase Page: {count}")
+        logger.debug(f"Finished Purchase Page: {count}")
         try:
             checkMorePurchases(sb=sb)
         except LastPageError:

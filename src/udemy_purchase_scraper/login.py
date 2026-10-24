@@ -75,7 +75,7 @@ def handleLogin() -> None:
             logger.info("Activating Headed mode for manual login")
         except:
             retry = retry + 1
-            logger.info("Unsuccessful Login")
+            logger.warning("Unsuccessful Login")
     os.environ["HEADLESS"] = "true" if original_headless else "false"
     logger.critical("Ran out of login attempts")
     raise RetryError("Ran out of retries")
