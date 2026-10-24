@@ -1,5 +1,4 @@
 from dotenv import load_dotenv, find_dotenv
-from dataclasses import dataclass
 from pathlib import Path
 import logging
 import os
@@ -59,8 +58,10 @@ class Config():
         self.OUTPUT_PATH: Path = None
 
     def load(self, env_path: str|None = None):
+        """
+        Loads the Config settings from environment variables and the .env file
+        """
         if env_path is None:
-            #path = Path(os.getcwd()) / ".env"
             path = Path(find_dotenv(usecwd=True))
         else:
             path = Path(env_path)

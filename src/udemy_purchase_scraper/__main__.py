@@ -21,11 +21,11 @@ def main():
                         help="Path to the target .env file")
     parser.add_argument("-ll", "--log-level",
                         type = str,
-                        help="Logging Level: DEBUG, INFO, WARNING, ERROR, CRITICAL. Default (INFO)",
+                        help="Logging Level: DEBUG, INFO, WARNING, ERROR, CRITICAL. (Default: INFO)",
                         default="INFO")
     parser.add_argument("-lf", "--log-file",
                         type = str,
-                        help="Path for the log file (default: Udemy.log)",
+                        help="Path for the log file (Default: Udemy.log)",
                         default="Udemy.log")
     args = parser.parse_args()
     logging.basicConfig(level=checkLogLevel(args.log_level),
