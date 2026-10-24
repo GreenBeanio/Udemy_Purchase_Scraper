@@ -1284,6 +1284,9 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "ipykernel" },
+    { name = "pytest" },
+    { name = "pytest-html" },
+    { name = "pytest-xdist" },
     { name = "python-dotenv" },
 ]
 
@@ -1298,6 +1301,9 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "ipykernel" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-html", specifier = ">=4.0.2" },
+    { name = "pytest-xdist", specifier = ">=3.8.0" },
     { name = "python-dotenv" },
 ]
 

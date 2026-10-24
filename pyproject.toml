@@ -22,5 +22,13 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "ipykernel",
-    "python-dotenv"
+    "pytest>=9.1.1",
+    "pytest-html>=4.0.2",
+    "pytest-xdist>=3.8.0",
+    "python-dotenv",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib"
 ]
