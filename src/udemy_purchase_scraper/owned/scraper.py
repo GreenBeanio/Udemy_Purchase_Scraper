@@ -1,3 +1,4 @@
+from udemy_purchase_scraper.config import CONFIG
 from seleniumbase import BaseCase
 from seleniumbase.undetected.cdp_driver.element import Element
 import os

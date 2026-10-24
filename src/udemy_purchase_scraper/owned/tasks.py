@@ -1,3 +1,4 @@
+from udemy_purchase_scraper.config import CONFIG
 from udemy_purchase_scraper import browser
 from udemy_purchase_scraper.owned.scraper import getOwnedPages, getOwnedCurrentURLs
 from udemy_purchase_scraper.utils import loadCookies
