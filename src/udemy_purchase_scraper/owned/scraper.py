@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def getOwnedInformation(course: Element) -> UdemyCourseOwn:
     '''
-    
+    Scrapes a single owned course
     '''
     course_info: Element = course.query_selector("h3[data-purpose='course-title-url'] a")
     course_title = course_info.text
@@ -27,7 +27,7 @@ def getOwnedInformation(course: Element) -> UdemyCourseOwn:
 
 def getOwnedPage(sb: BaseCase) -> list[UdemyCourseOwn]:
     '''
-    
+    Scrapes a single owned courses page to get the courses on it
     '''
     courses_grid: Element = sb.find_element("div[class='my-courses__course-card-grid']")
     courses: list[Element] = courses_grid.query_selector_all(":scope > div")
@@ -36,7 +36,7 @@ def getOwnedPage(sb: BaseCase) -> list[UdemyCourseOwn]:
 
 def checkMoreOwned(sb: BaseCase) -> Element:
     '''
-    
+    Checks if there is another owned courses page
     '''
     try:
         next_page: Element = sb.find_element("a[class*=pagination-module--next][aria-label='next page'][aria-disabled='false']")
@@ -47,7 +47,7 @@ def checkMoreOwned(sb: BaseCase) -> Element:
 
 def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
     """
-    
+    Handles retries while scraping a single owned courses page
     """
     retry = 0
     while retry < int(os.environ.get("RETRY_LIMIT", 3)):
@@ -62,7 +62,9 @@ def getOwnedResults(sb: BaseCase) -> list[UdemyCourseOwn]:
 
 def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
     """
-    
+    Scrapes owned courses pages
+
+    Note that this does not currently scrape the archived courses option (as I have none, but it would easily be added)
     """
     sb.goto("https://www.udemy.com/home/my-courses/learning/?sort=-enroll_time")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
@@ -87,7 +89,7 @@ def getOwnedPages(sb: BaseCase) -> list[UdemyCourseOwn]:
 
 def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> str:
     """
-    x
+    Scrapes a owned course to get the url of its page listing
     """
     retry = 0
     while retry < int(os.environ.get("RETRY_LIMIT", 3)):
@@ -103,7 +105,7 @@ def getOwnedCurrentURLRequest(session: requests.Session, course_link: str) -> st
 
 def getOwnedCurrentURLs(owned: list[UdemyCourseOwn]) -> list[UdemyCourseOwn]:
     """
-    x
+    Scrapes owned courses to get the url of their page listing
     """
     requests_cookies = requestsCookiesFromSelenium()
     with requests.Session() as session:

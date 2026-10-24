@@ -2,10 +2,10 @@ from typing import Protocol
 
 class ExcelOutputable(Protocol):
     """
-    x
+    Class that can be turned into a dictionary for a Pandas Data Frame
     """
-    def toExcelDict() -> dict:
+    def toExcelDict() -> dict[str, any]:
         """
-        x
+        Turns a class into a dictionary for a Pandas Data Frame
         """
         ...

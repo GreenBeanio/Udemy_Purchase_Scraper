@@ -1,15 +1,16 @@
 from udemy_purchase_scraper import browser
 from udemy_purchase_scraper.purchase.scraper import getPurchasePages
 from udemy_purchase_scraper.utils import loadCookies
+from udemy_purchase_scraper.purchase.classes import UdemyPurchase
 import time
 import os
 import logging
 
 logger = logging.getLogger(__name__)
 
-def taskPurchases() -> None:
+def taskPurchases() -> list[UdemyPurchase]:
     """
-    x
+    Multithreading task to scrape Udemy purchases
     """
     manager = browser.startBrowser()
     with manager as sb:

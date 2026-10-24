@@ -1,15 +1,16 @@
 from udemy_purchase_scraper import browser
 from udemy_purchase_scraper.owned.scraper import getOwnedPages, getOwnedCurrentURLs
 from udemy_purchase_scraper.utils import loadCookies
+from udemy_purchase_scraper.owned.classes import UdemyCourseOwn
 import time
 import os
 import logging
 
 logger = logging.getLogger(__name__)
 
-def taskOwned() -> None:
+def taskOwned() -> list[UdemyCourseOwn]:
     """
-    x
+    Multithreading task to scrape owned Udemy courses
     """
     manager = browser.startBrowser()
     with manager as sb:

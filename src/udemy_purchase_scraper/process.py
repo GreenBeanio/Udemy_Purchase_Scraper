@@ -1,4 +1,5 @@
-from udemy_purchase_scraper.owned.classes import UdemyCoursePurchaseDetails
+from udemy_purchase_scraper.owned.classes import UdemyCoursePurchaseDetails, UdemyCourseOwn
+from udemy_purchase_scraper.purchase.classes import UdemyPurchase
 from udemy_purchase_scraper.protocols import ExcelOutputable
 import pandas as pd
 import os
@@ -8,19 +9,22 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def getOwnedDict(owned: any):
+def getOwnedDict(owned: list[UdemyCourseOwn]) -> dict[str, None]:
     """
-    x
-    Needs owned in oldest to newest such as from getOwnedPages
+    Gets dictionary of the newest instance owned course
     """
     owned_dict = {}
     for course in owned:
-        owned_dict[course.course_page] = course
+        owned_dict[course.course_page] = None
     return owned_dict 
 
-def recalculatePurchases(purchases, owned_dict):
+def processPurchases(purchases: list[UdemyPurchase], owned_dict: dict):
     """
-    x
+    Processes the purchases
+
+    Filters the purchases to only include the newest purchase of a specific course and
+    only courses that are actually owned and haven't been refunded.
+
     Needs purchases in oldest to newest such as from getPurchasePages
     """
     purchases.reverse() # Logic needs to be in newest to oldest
@@ -40,9 +44,9 @@ def recalculatePurchases(purchases, owned_dict):
             ind = ind + 1
     purchases.reverse() # Return it as oldest to newest to match the input
 
-def getCoursePurchaseDetails(purchases):
+def getCoursePurchaseDetails(purchases: list[UdemyPurchase]) -> dict[str, UdemyCoursePurchaseDetails]:
     """
-    x
+    Gets purchase details to add into the Udemy owned courses
     """
     course_details = {}
     for purchase in purchases:
@@ -53,33 +57,33 @@ def getCoursePurchaseDetails(purchases):
                 course_cost=course.course_cost)
     return course_details 
 
-def mergeOwned(owned, course_purchase_details):
+def mergeOwned(owned: list[UdemyCourseOwn], course_purchase_details: dict):
     """
-    x
+    Merges purchase information into the Udemy owned courses
     """
     for crs_ind, course in enumerate(owned):
         if course.course_page in course_purchase_details:
             owned[crs_ind].purchase = course_purchase_details[course.course_page]
 
-def processItems(owned, purchases):
+def processItems(owned: list[UdemyCourseOwn], purchases: list[UdemyPurchase]):
     """
-    x
+    Processes the owned courses and purchases
     """
     owned_dict = getOwnedDict(owned)
-    recalculatePurchases(purchases, owned_dict)
+    processPurchases(purchases, owned_dict)
     course_purchase_details = getCoursePurchaseDetails(purchases)
     mergeOwned(owned, course_purchase_details)
     logger.info("Items Processed")
 
 def toDF(source_list: ExcelOutputable) -> pd.DataFrame:
     """
-    x
+    Converts Udemy classes into data frames
     """
     return pd.DataFrame([item.toExcelDict() for item in source_list])
 
-def exportAllExcel(owned, purchases):
+def exportAllExcel(owned: list[UdemyCourseOwn], purchases: list[UdemyPurchase]):
     """
-    x
+    Exports Udemy classes into an Excel file
     """
     output_path = Path(os.environ.get("OUTPUT_PATH", "Udemy.xlsx"))
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:

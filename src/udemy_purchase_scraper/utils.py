@@ -4,15 +4,12 @@ import json
 import os
 from seleniumbase import BaseCase
 import time
-import pickle
-from udemy_purchase_scraper.purchase.classes import UdemyPurchase
-from udemy_purchase_scraper.owned.classes import UdemyCourseOwn
 from udemy_purchase_scraper.exceptions import BadCookies
 from pathlib import Path
 
 def checkForceNewCookies() -> bool:
     """
-    x
+    Checks for the FORCE_NEW_COOKIES environment variable
     """
     force_new_cookies = os.environ.get("FORCE_NEW_COOKIES", False)
     if isinstance(force_new_cookies, str):
@@ -26,7 +23,7 @@ def checkForceNewCookies() -> bool:
 
 def checkHeadless() -> bool:
     """
-    x
+    Checks for the HEADLESS environment variable
     """
     run_headless = os.environ.get("HEADLESS", False)
     if isinstance(run_headless, str):
@@ -35,7 +32,7 @@ def checkHeadless() -> bool:
 
 def checkUseHeadless() -> bool:
     """
-    x
+    Checks environment variables to see if we can run in headless mode
     """
     run_headless = checkHeadless()
     force_new_cookies = checkForceNewCookies()
@@ -44,7 +41,7 @@ def checkUseHeadless() -> bool:
 
 def checkChromeVersion() -> int|None:
     """
-    x
+    Checks for the CHROME_VERSION environment variable
     """
     chrome_version = os.environ.get("CHROME_VERSION", None)
     if isinstance(chrome_version, str):
@@ -59,13 +56,7 @@ def checkChromeVersion() -> int|None:
 
 def saveCookies(sb: BaseCase) -> None:
     '''
-    Saves the cookies from your udemy in
-
-    :param driver: The web driver
-    :type driver: Chrome
-
-    :return: Nothing
-    :rtype: None
+    Saves Udemy cookies
     '''
     cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
     saved_cookies = sb.get_cookies()
@@ -74,13 +65,7 @@ def saveCookies(sb: BaseCase) -> None:
 
 def loadCookies(sb: BaseCase) -> None:
     '''
-    Loads your Udemy cookies in
-
-    :param driver: The web driver
-    :type driver: Chrome
-
-    :return: Nothing
-    :rtype: None
+    Loads Udemy cookies
     '''
     cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
     if not cookies_path.exists():
@@ -94,7 +79,7 @@ def loadCookies(sb: BaseCase) -> None:
 
 def requestsCookiesFromSelenium() -> requests.cookies.RequestsCookieJar:
     '''
-    x
+    Turns selenium cookies into cookies for Requests
     '''
     cookies_path = Path(os.environ.get("COOKIES_PATH", "cookies.json"))
     with open(cookies_path, "r") as file:
@@ -114,42 +99,3 @@ def requestsCookiesFromSelenium() -> requests.cookies.RequestsCookieJar:
                 )
             )
     return jar 
-
-def savePurchases(purchase_data: list[UdemyPurchase]) -> None:
-    '''
-    x
-    '''
-    data_path = Path(os.environ.get("PUR_PATH", "purchases.pkl"))
-    with open(data_path, "wb") as save_file:
-        pickle.dump(purchase_data, save_file)
-
-def saveOwned(owned_data: list[UdemyCourseOwn]) -> None:
-    '''
-    x
-    '''
-    data_path = Path(os.environ.get("OWN_PATH", "owned.pkl"))
-    with open(data_path, "wb") as save_file:
-        pickle.dump(owned_data, save_file)
-
-def loadPurchases() -> list[UdemyPurchase]:
-    '''
-    x
-    '''
-    data_path = Path(os.environ.get("PUR_PATH", "purchases.pkl"))
-    if not os.path.exists(data_path):
-        raise FileNotFoundError("Purchases file does not exist")
-    with open(data_path, "rb") as load_file:
-        data_load = pickle.load(load_file)
-        return data_load 
-
-def loadOwned() -> list[UdemyCourseOwn]:
-    '''
-    x
-    '''
-    data_path = Path(os.environ.get("OWN_PATH", "owned.pkl"))
-    if not os.path.exists(data_path):
-        raise FileNotFoundError("Owned file does not exist")
-
-    with open(data_path, "rb") as load_file:
-        data_load = pickle.load(load_file)
-        return data_load 

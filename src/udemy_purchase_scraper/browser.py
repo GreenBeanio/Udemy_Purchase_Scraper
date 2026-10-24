@@ -6,7 +6,7 @@ from collections.abc import Generator
 @contextmanager
 def startBrowser() -> Generator[SB, None, None]:
     """
-    x
+    Starts a Selenium browser instance
     """
     is_headless = checkUseHeadless()
     chrome_version = checkChromeVersion()

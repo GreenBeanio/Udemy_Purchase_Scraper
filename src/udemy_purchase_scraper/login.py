@@ -10,9 +10,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def watchLogin(sb: BaseCase) -> None:
+def checkLogin(sb: BaseCase) -> None:
     """
-    x
+    Checks Selenium for the Udemy login status
     """
     sb.maximize()
     sb.set_messenger_theme(theme="flat", location="top_center")
@@ -27,7 +27,7 @@ def watchLogin(sb: BaseCase) -> None:
              
 def attemptLogin() -> None:
     """
-    x
+    Attempts logging into Udemy
     """
     manager = startBrowser()
     with manager as sb:
@@ -38,14 +38,14 @@ def attemptLogin() -> None:
         if checkForceNewCookies():
             if checkUseHeadless():
                 raise NeedHead("In headless mode but need headed for login")
-            watchLogin(sb=sb)
+            checkLogin(sb=sb)
         else:
             try:
                 loadCookies(sb=sb)
             except :
                 if checkUseHeadless():
                     raise NeedHead("In headless mode but need headed for login")
-                watchLogin(sb=sb)
+                checkLogin(sb=sb)
 
         sb.refresh()
         time.sleep(int(os.environ.get("SLEEP_TIME", 3)))
@@ -57,9 +57,9 @@ def attemptLogin() -> None:
             cookies_path.unlink()
             raise BadCookies("Login was unsuccessful")
 
-def checkLogin() -> None:
+def handleLogin() -> None:
     """
-    x
+    Handles logging into Udemy
     """
     original_headless = checkHeadless()
     retry = 0

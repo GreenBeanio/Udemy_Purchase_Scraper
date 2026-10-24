@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def getPurchasePage(sb: BaseCase) -> list[Element]:
     '''
-    A function to get the purchases from the 'purchase-history' page
+    Scrapes a purchases page
     '''
     purchase_table: Element = sb.find_element("table[class*='paginated-table_purchase-history-table']")
     purchases: list[Element] = purchase_table.query_selector_all("tr[class*='paginated-table_purchase-history-table--main-row']")
@@ -21,7 +21,7 @@ def getPurchasePage(sb: BaseCase) -> list[Element]:
 
 def getPurchaseInformation(purchase: Element, sb: SB) -> UdemyPurchase:
     '''
-    
+    Scrapes a single purchased course
     '''
     purchase_number: Element = purchase.query_selector_all('span.ud-btn-label')
     for c_pur in purchase_number:
@@ -47,7 +47,7 @@ def getPurchaseInformation(purchase: Element, sb: SB) -> UdemyPurchase:
 
 def checkMultipleCourses(purchase: Element) -> Element:
     '''
-    A function to check if a purchase has multiple courses
+    Checks if a purchase has multiple courses
     '''
     link_section: Element = purchase.query_selector("div[class*='paginated-table_purchase-details--text-container']")
     show_more_button: Element = link_section.query_selector("button[class*='show-more_focusable-label']")
@@ -57,7 +57,7 @@ def checkMultipleCourses(purchase: Element) -> Element:
 
 def getPurchaseCourseSingle(purchase: Element) -> UdemyCoursePurchase:
     '''
-    A function to get the courses from a purchase with a single course
+    Scrapes a purchase with a single courses included
     '''
     course_name_element: Element = purchase.query_selector("div[class*='paginated-table_purchase-details--content-title-text']")
     course_name_element: Element = course_name_element.query_selector("a")
@@ -72,15 +72,15 @@ def getPurchaseCourseSingle(purchase: Element) -> UdemyCoursePurchase:
 
 def getPurchaseCourseMultiple(sb: BaseCase) -> list[Element]:
     '''
-    A function to get the courses from a purchase with multiple courses
+    Scrapes a purchase with multiple courses included
     '''
     courses: list[Element] = sb.find_elements("tr[class*='paginated-table_purchase-history-table--sub-row']")
     courses = [getPurchaseCourseSingle(purchase=course) for course in courses]
     return courses 
 
-def getPurchaseCourses(purchase: any, sb: BaseCase) -> list[UdemyCoursePurchase]:
+def getPurchaseCourses(purchase: Element, sb: BaseCase) -> list[UdemyCoursePurchase]:
     '''
-    A function to get the courses in a purchase
+    Scrapes a single purchases page to get the courses on it
     '''
     try:
         expand_purchase = checkMultipleCourses(purchase)
@@ -95,7 +95,7 @@ def getPurchaseCourses(purchase: any, sb: BaseCase) -> list[UdemyCoursePurchase]
 
 def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
     """
-    A function to get the results from a page of purchases
+    Handles retries while scraping a single purchases page
     """
     retry = 0
     while retry < int(os.environ.get("RETRY_LIMIT", 3)):
@@ -115,7 +115,7 @@ def getPurchasePageResults(sb: BaseCase) -> list[UdemyPurchase]:
 
 def checkMorePurchases(sb: BaseCase) -> None:
     '''
-    A function to check if a purchase has multiple courses
+    Checks if there is another owned purchases page
     '''
     try:
         next_page: Element = sb.find_element("a[class*=pagination_next][aria-label='next page'][aria-disabled='false']")
@@ -127,7 +127,7 @@ def checkMorePurchases(sb: BaseCase) -> None:
 
 def getPurchasePages(sb: BaseCase) -> list[UdemyPurchase]:
     """
-    A function to get the purchase results from all pages
+    Scrapes purchase pages
     """
     sb.goto("https://www.udemy.com/dashboard/purchase-history/")
     time.sleep(int(os.environ.get("SLEEP_TIME", 3)))

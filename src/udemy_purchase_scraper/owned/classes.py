@@ -4,6 +4,9 @@ import datetime
 
 @dataclass
 class UdemyCoursePurchaseDetails:
+    '''
+    Stores purchase details for owned courses
+    '''
     course_purchase: str
     course_date: datetime.date
     course_cost: Decimal
@@ -11,7 +14,7 @@ class UdemyCoursePurchaseDetails:
 @dataclass
 class UdemyCourseOwn:
     '''
-    A class to store Udemy courses
+    Store Udemy owned courses
     '''
     course_name: str
     course_link: str
@@ -19,7 +22,7 @@ class UdemyCourseOwn:
     course_page: str|None = None
     purchase: UdemyCoursePurchaseDetails|None = None
 
-    def toExcelDict(self):
+    def toExcelDict(self) -> dict[str, str | Decimal | datetime.datetime | None]:
         """
         x
         """

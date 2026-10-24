@@ -5,7 +5,7 @@ import datetime
 @dataclass
 class UdemyCoursePurchase:
     '''
-    A class to store Udemy courses
+    Stores Udemy courses for purchases
     '''
     course_name: str
     course_link: str
@@ -14,20 +14,19 @@ class UdemyCoursePurchase:
 @dataclass
 class UdemyPurchase:
     '''
-    A class to store udemy purchases
+    Stores Udemy purchases
     '''
     purchase_number: str
     purchase_date: datetime.date
     purchase_cost: Decimal
     courses: any|None = None
 
-    def toExcelDict(self):
+    def toExcelDict(self) -> dict[str, str, datetime.datetime, Decimal]:
         """
         x
         """
         return({
             "purchase_number": self.purchase_number,
             "purchase_date": self.purchase_date,
-            "purchase_cost": self.purchase_cost,
-            "course_count": len(self.courses)
+            "purchase_cost": self.purchase_cost
         })
