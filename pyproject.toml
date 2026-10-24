@@ -1,6 +1,6 @@
 [project]
 name = "udemy-purchase-scraper"
-version = "0.0.1"
+version = "1.0.0"
 description = "Scrapes Udemy for purchases"
 authors = [
     {name = "Garrett Johnson",email = "pingujohnson@gmail.com"}
