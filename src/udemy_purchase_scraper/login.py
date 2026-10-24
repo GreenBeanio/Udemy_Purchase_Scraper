@@ -42,16 +42,13 @@ def attemptLogin(is_headless: bool) -> None:
         else:
             try:
                 loadCookies(sb=sb)
-            except :
-                if checkUseHeadless():
+            except:
+                if is_headless:
                     raise NeedHead("In headless mode but need headed for login")
                 checkLogin(sb=sb)
-
         sb.refresh()
         time.sleep(CONFIG.SLEEP_TIME)
-
         login_button = sb.is_element_present("a[data-purpose='header-login']")
-
         if login_button:
             CONFIG.COOKIES_PATH.unlink()
             raise BadCookies("Login was unsuccessful")
